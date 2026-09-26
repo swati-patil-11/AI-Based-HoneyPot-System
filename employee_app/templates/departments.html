@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Department Management</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/css/style.css"
+    >
+
+</head>
+
+
+<body>
+
+<div class="dashboard-layout">
+
+    <!-- =====================================================
+         SIDEBAR
+         ===================================================== -->
+
+    <aside class="sidebar">
+
+        <h2>Employee System</h2>
+
+        <nav>
+
+            <a href="/dashboard">
+                Dashboard
+            </a>
+
+            <a href="/employees-page">
+                Employees
+            </a>
+
+            <a href="/departments-page">
+                Departments
+            </a>
+
+            <a href="/attendance-page">
+                Attendance
+            </a>
+
+            <a href="/payroll-page">Payroll</a>
+
+            <a href="/profile-page">My Profile</a>
+
+        </nav>
+
+        <button
+            id="logoutButton"
+            class="logout-button"
+        >
+            Logout
+        </button>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+         ===================================================== -->
+
+    <main class="main-content">
+
+        <header class="dashboard-header">
+
+            <div>
+
+                <h1>
+                    Department Management
+                </h1>
+
+                <p id="departmentPageWelcome">
+                    Manage departments
+                </p>
+
+            </div>
+
+
+            <button
+                id="showAddDepartmentButton"
+                class="btn-primary department-add-button"
+            >
+                + Add Department
+            </button>
+
+        </header>
+
+
+        <!-- =================================================
+             ACCESS MESSAGE
+             ================================================= -->
+
+        <div
+            id="departmentAccessMessage"
+            class="message"
+        ></div>
+
+
+        <!-- =================================================
+             ADD / EDIT DEPARTMENT FORM
+             ================================================= -->
+
+        <section
+            id="departmentFormSection"
+            class="profile-card"
+            style="display: none;"
+        >
+
+            <h2 id="departmentFormTitle">
+                Add New Department
+            </h2>
+
+
+            <form id="departmentForm">
+
+                <input
+                    type="hidden"
+                    id="departmentEditId"
+                >
+
+
+                <div class="form-grid department-form-grid">
+
+                    <div class="form-group">
+
+                        <label for="departmentName">
+                            Department Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="departmentName"
+                            placeholder="Information Technology"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="departmentDescription">
+                            Description
+                        </label>
+
+                        <input
+                            type="text"
+                            id="departmentDescription"
+                            placeholder="Technology and software development"
+                        >
+
+                    </div>
+
+
+                    <div
+                        class="form-group"
+                        id="departmentStatusGroup"
+                    >
+
+                        <label for="departmentStatus">
+                            Status
+                        </label>
+
+                        <select id="departmentStatus">
+
+                            <option value="Active">
+                                Active
+                            </option>
+
+                            <option value="Inactive">
+                                Inactive
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-actions">
+
+                    <button
+                        type="submit"
+                        class="btn-primary"
+                        id="departmentSubmitButton"
+                    >
+                        Create Department
+                    </button>
+
+
+                    <button
+                        type="button"
+                        id="cancelDepartmentButton"
+                        class="btn-secondary"
+                    >
+                        Cancel
+                    </button>
+
+                </div>
+
+            </form>
+
+
+            <div
+                id="departmentFormMessage"
+                class="message"
+            ></div>
+
+        </section>
+
+
+        <!-- =================================================
+             DEPARTMENT LIST
+             ================================================= -->
+
+        <section class="profile-card">
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>
+                        Departments
+                    </h2>
+
+                    <p>
+                        Departments currently registered
+                        in the system
+                    </p>
+
+                </div>
+
+
+                <button
+                    id="refreshDepartmentsButton"
+                    class="btn-secondary"
+                >
+                    Refresh
+                </button>
+
+            </div>
+
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                ID
+                            </th>
+
+                            <th>
+                                Department Name
+                            </th>
+
+                            <th>
+                                Description
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Actions
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="departmentTableBody">
+
+                        <tr>
+
+                            <td
+                                colspan="5"
+                                class="empty-table"
+                            >
+                                Loading departments...
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<script src="/static/js/app.js"></script>
+
+</body>
+
+</html>

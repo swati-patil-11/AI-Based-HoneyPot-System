@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Attendance Management</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/css/style.css"
+    >
+
+</head>
+
+
+<body>
+
+<div class="dashboard-layout">
+
+    <!-- =====================================================
+         SIDEBAR
+         ===================================================== -->
+
+    <aside class="sidebar">
+
+        <h2>Employee System</h2>
+
+        <nav>
+
+            <a href="/dashboard">
+                Dashboard
+            </a>
+
+            <a href="/employees-page">
+                Employees
+            </a>
+
+            <a href="/departments-page">
+                Departments
+            </a>
+
+            <a href="/attendance-page">
+                Attendance
+            </a>
+
+            <a href="/payroll-page">Payroll</a>
+
+            <a href="/profile-page">My Profile</a>
+        </nav>
+
+        <button
+            id="logoutButton"
+            class="logout-button"
+        >
+            Logout
+        </button>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+         ===================================================== -->
+
+    <main class="main-content">
+
+        <header class="dashboard-header">
+
+            <div>
+
+                <h1>
+                    Attendance Management
+                </h1>
+
+                <p id="attendancePageWelcome">
+                    Attendance
+                </p>
+
+            </div>
+
+        </header>
+
+
+        <!-- =================================================
+             EMPLOYEE ATTENDANCE SECTION
+             ================================================= -->
+
+        <section
+            id="employeeAttendanceSection"
+            class="dashboard-section"
+            style="display: none;"
+        >
+
+            <div class="profile-card">
+
+                <h2>
+                    Mark Today's Attendance
+                </h2>
+
+                <p class="attendance-date-text">
+                    Date:
+                    <strong id="todayAttendanceDate">
+                        -
+                    </strong>
+                </p>
+
+
+                <form id="attendanceForm">
+
+                    <div class="form-grid attendance-form-grid">
+
+                        <div class="form-group">
+
+                            <label for="attendanceStatus">
+
+                                Attendance Status
+
+                            </label>
+
+                            <select
+                                id="attendanceStatus"
+                                required
+                            >
+
+                                <option value="Present">
+                                    Present
+                                </option>
+
+                                <option value="Absent">
+                                    Absent
+                                </option>
+
+                                <option value="Leave">
+                                    Leave
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="attendanceRemarks">
+
+                                Remarks
+
+                            </label>
+
+                            <input
+                                type="text"
+                                id="attendanceRemarks"
+                                placeholder="Optional remarks"
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-actions">
+
+                        <button
+                            type="submit"
+                            class="btn-primary"
+                            id="markAttendanceButton"
+                        >
+                            Mark Attendance
+                        </button>
+
+                    </div>
+
+                </form>
+
+
+                <div
+                    id="attendanceFormMessage"
+                    class="message"
+                ></div>
+
+            </div>
+
+
+            <!-- Today's Attendance -->
+
+            <div class="profile-card">
+
+                <h2>
+                    Today's Attendance
+                </h2>
+
+                <div
+                    id="todayAttendanceResult"
+                    class="attendance-result"
+                >
+                    Checking attendance...
+                </div>
+
+            </div>
+
+
+            <!-- My Attendance History -->
+
+            <div class="profile-card">
+
+                <div class="section-header">
+
+                    <div>
+
+                        <h2>
+                            My Attendance History
+                        </h2>
+
+                        <p>
+                            Your attendance records
+                        </p>
+
+                    </div>
+
+
+                    <button
+                        id="refreshMyAttendanceButton"
+                        class="btn-secondary"
+                    >
+                        Refresh
+                    </button>
+
+                </div>
+
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Date
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                                <th>
+                                    Remarks
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="myAttendanceTableBody">
+
+                            <tr>
+
+                                <td
+                                    colspan="3"
+                                    class="empty-table"
+                                >
+                                    Loading attendance...
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             ADMIN / HR ATTENDANCE SECTION
+             ================================================= -->
+
+        <section
+            id="adminAttendanceSection"
+            class="dashboard-section"
+            style="display: none;"
+        >
+
+            <div class="profile-card">
+
+                <h2>
+                    Attendance Filters
+                </h2>
+
+
+                <div class="form-grid attendance-filter-grid">
+
+                    <div class="form-group">
+
+                        <label for="attendanceFilterDate">
+
+                            Attendance Date
+
+                        </label>
+
+                        <input
+                            type="date"
+                            id="attendanceFilterDate"
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="attendanceFilterEmployee">
+
+                            Employee Database ID
+
+                        </label>
+
+                        <input
+                            type="number"
+                            id="attendanceFilterEmployee"
+                            placeholder="Example: 1"
+                            min="1"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-actions">
+
+                    <button
+                        id="applyAttendanceFilterButton"
+                        class="btn-primary"
+                    >
+                        Apply Filter
+                    </button>
+
+
+                    <button
+                        id="clearAttendanceFilterButton"
+                        class="btn-secondary"
+                    >
+                        Clear
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- All Attendance -->
+
+            <div class="profile-card">
+
+                <div class="section-header">
+
+                    <div>
+
+                        <h2>
+                            Attendance Records
+                        </h2>
+
+                        <p>
+                            Attendance records for employees
+                        </p>
+
+                    </div>
+
+
+                    <button
+                        id="refreshAllAttendanceButton"
+                        class="btn-secondary"
+                    >
+                        Refresh
+                    </button>
+
+                </div>
+
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    ID
+                                </th>
+
+                                <th>
+                                    Employee ID
+                                </th>
+
+                                <th>
+                                    Employee Code
+                                </th>
+
+                                <th>
+                                    Employee Name
+                                </th>
+
+                                <th>
+                                    Date
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                                <th>
+                                    Remarks
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="allAttendanceTableBody">
+
+                            <tr>
+
+                                <td
+                                    colspan="7"
+                                    class="empty-table"
+                                >
+                                    Loading attendance...
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             ACCESS DENIED
+             ================================================= -->
+
+        <section
+            id="attendanceAccessDenied"
+            class="profile-card"
+            style="display: none;"
+        >
+
+            <h2>
+                Access Denied
+            </h2>
+
+            <p>
+                Your account does not have permission
+                to access attendance management.
+            </p>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<script src="/static/js/app.js"></script>
+
+<script src="/static/js/attendance.js"></script>
+
+</body>
+
+</html>

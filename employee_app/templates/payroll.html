@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Payroll Management</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/css/style.css"
+    >
+
+</head>
+
+
+<body>
+
+<div class="dashboard-layout">
+
+    <!-- =====================================================
+         SIDEBAR
+         ===================================================== -->
+
+    <aside class="sidebar">
+
+        <h2>Employee System</h2>
+
+        <nav>
+
+            <a href="/dashboard">
+                Dashboard
+            </a>
+
+            <a href="/employees-page">
+                Employees
+            </a>
+
+            <a href="/departments-page">
+                Departments
+            </a>
+
+            <a href="/attendance-page">
+                Attendance
+            </a>
+
+            <a href="/payroll-page">
+                Payroll
+            </a>
+
+            <a href="/profile-page">My Profile</a>
+
+        </nav>
+
+        <button
+            id="logoutButton"
+            class="logout-button"
+        >
+            Logout
+        </button>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+         ===================================================== -->
+
+    <main class="main-content">
+
+        <header class="dashboard-header">
+
+            <div>
+
+                <h1>
+                    Payroll Management
+                </h1>
+
+                <p id="payrollPageWelcome">
+                    Payroll
+                </p>
+
+            </div>
+
+        </header>
+
+
+        <!-- =================================================
+             EMPLOYEE PAYROLL
+             ================================================= -->
+
+        <section
+            id="employeePayrollSection"
+            class="dashboard-section"
+            style="display: none;"
+        >
+
+            <div class="profile-card">
+
+                <h2>
+                    My Salary
+                </h2>
+
+                <p>
+                    Your salary information
+                </p>
+
+            </div>
+
+
+            <div
+                id="employeeSalaryCard"
+                class="salary-summary-grid"
+            >
+
+                <div class="salary-card">
+
+                    <h3>
+                        Employee
+                    </h3>
+
+                    <p
+                        id="mySalaryEmployee"
+                        class="salary-value"
+                    >
+                        -
+                    </p>
+
+                </div>
+
+
+                <div class="salary-card">
+
+                    <h3>
+                        Basic Salary
+                    </h3>
+
+                    <p
+                        id="myBasicSalary"
+                        class="salary-value"
+                    >
+                        -
+                    </p>
+
+                </div>
+
+
+                <div class="salary-card">
+
+                    <h3>
+                        Allowances
+                    </h3>
+
+                    <p
+                        id="myAllowances"
+                        class="salary-value"
+                    >
+                        -
+                    </p>
+
+                </div>
+
+
+                <div class="salary-card">
+
+                    <h3>
+                        Deductions
+                    </h3>
+
+                    <p
+                        id="myDeductions"
+                        class="salary-value"
+                    >
+                        -
+                    </p>
+
+                </div>
+
+
+                <div class="salary-card salary-net-card">
+
+                    <h3>
+                        Net Salary
+                    </h3>
+
+                    <p
+                        id="myNetSalary"
+                        class="salary-value"
+                    >
+                        -
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="profile-card">
+
+                <h2>
+                    Salary Breakdown
+                </h2>
+
+                <div class="salary-breakdown">
+
+                    <div class="salary-breakdown-row">
+
+                        <span>
+                            Basic Salary
+                        </span>
+
+                        <strong
+                            id="breakdownBasic"
+                        >
+                            -
+                        </strong>
+
+                    </div>
+
+
+                    <div class="salary-breakdown-row">
+
+                        <span>
+                            Allowances
+                        </span>
+
+                        <strong
+                            id="breakdownAllowances"
+                        >
+                            -
+                        </strong>
+
+                    </div>
+
+
+                    <div class="salary-breakdown-row">
+
+                        <span>
+                            Deductions
+                        </span>
+
+                        <strong
+                            id="breakdownDeductions"
+                        >
+                            -
+                        </strong>
+
+                    </div>
+
+
+                    <div
+                        class="salary-breakdown-row salary-total-row"
+                    >
+
+                        <span>
+                            Net Salary
+                        </span>
+
+                        <strong
+                            id="breakdownNet"
+                        >
+                            -
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="employeeSalaryMessage"
+                class="message"
+            ></div>
+
+        </section>
+
+
+        <!-- =================================================
+             ADMIN / HR PAYROLL
+             ================================================= -->
+
+        <section
+            id="adminPayrollSection"
+            class="dashboard-section"
+            style="display: none;"
+        >
+
+            <!-- Add Salary -->
+
+            <section
+                id="salaryFormSection"
+                class="profile-card"
+            >
+
+                <h2>
+                    Add Salary Record
+                </h2>
+
+                <p>
+                    Create a salary record for an employee.
+                </p>
+
+
+                <form id="salaryForm">
+
+                    <div class="form-grid payroll-form-grid">
+
+                        <div class="form-group">
+
+                            <label for="salaryEmployeeId">
+                                Employee Database ID
+                            </label>
+
+                            <input
+                                type="number"
+                                id="salaryEmployeeId"
+                                min="1"
+                                placeholder="Example: 1"
+                                required
+                            >
+
+                            <small>
+                                Use the employee database ID,
+                                not EMP001/EMP002.
+                            </small>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="basicSalaryInput">
+                                Basic Salary
+                            </label>
+
+                            <input
+                                type="number"
+                                id="basicSalaryInput"
+                                min="0"
+                                step="0.01"
+                                placeholder="50000"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="allowancesInput">
+                                Allowances
+                            </label>
+
+                            <input
+                                type="number"
+                                id="allowancesInput"
+                                min="0"
+                                step="0.01"
+                                value="0"
+                            >
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="deductionsInput">
+                                Deductions
+                            </label>
+
+                            <input
+                                type="number"
+                                id="deductionsInput"
+                                min="0"
+                                step="0.01"
+                                value="0"
+                            >
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="currencyInput">
+                                Currency
+                            </label>
+
+                            <select id="currencyInput">
+
+                                <option value="INR">
+                                    INR
+                                </option>
+
+                                <option value="USD">
+                                    USD
+                                </option>
+
+                                <option value="EUR">
+                                    EUR
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-actions">
+
+                        <button
+                            type="submit"
+                            class="btn-primary"
+                            id="createSalaryButton"
+                        >
+                            Create Salary Record
+                        </button>
+
+                    </div>
+
+                </form>
+
+
+                <div
+                    id="salaryFormMessage"
+                    class="message"
+                ></div>
+
+            </section>
+
+
+            <!-- Salary List -->
+
+            <section class="profile-card">
+
+                <div class="section-header">
+
+                    <div>
+
+                        <h2>
+                            Salary Records
+                        </h2>
+
+                        <p>
+                            All employee salary records
+                        </p>
+
+                    </div>
+
+
+                    <button
+                        id="refreshSalaryButton"
+                        class="btn-secondary"
+                    >
+                        Refresh
+                    </button>
+
+                </div>
+
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Salary ID
+                                </th>
+
+                                <th>
+                                    Employee ID
+                                </th>
+
+                                <th>
+                                    Employee Code
+                                </th>
+
+                                <th>
+                                    Employee Name
+                                </th>
+
+                                <th>
+                                    Basic
+                                </th>
+
+                                <th>
+                                    Allowances
+                                </th>
+
+                                <th>
+                                    Deductions
+                                </th>
+
+                                <th>
+                                    Net Salary
+                                </th>
+
+                                <th>
+                                    Currency
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="salaryTableBody">
+
+                            <tr>
+
+                                <td
+                                    colspan="9"
+                                    class="empty-table"
+                                >
+                                    Loading salary records...
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+        </section>
+
+
+        <!-- =================================================
+             ACCESS DENIED
+             ================================================= -->
+
+        <section
+            id="payrollAccessDenied"
+            class="profile-card"
+            style="display: none;"
+        >
+
+            <h2>
+                Access Denied
+            </h2>
+
+            <p>
+                Your account does not have permission
+                to access payroll.
+            </p>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<script src="/static/js/app.js"></script>
+
+<script src="/static/js/payroll.js"></script>
+
+</body>
+
+</html>

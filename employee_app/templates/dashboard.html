@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Employee Management System - Dashboard
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="/static/css/style.css"
+    >
+
+</head>
+
+<body>
+
+    <div class="dashboard-layout">
+
+
+        <!-- SIDEBAR -->
+
+        <aside class="sidebar">
+
+            <h2>
+                Employee System
+            </h2>
+
+
+            <nav>
+                <a href="/dashboard">Dashboard</a>
+                <a href="/employees-page">Employees</a>
+                <a href="/departments-page">Departments</a>
+                <a href="/attendance-page">Attendance</a>
+                <a href="/payroll-page">Payroll</a>
+                <a href="/profile-page">My Profile</a>
+            </nav>
+
+
+            <button
+                id="logoutButton"
+                class="logout-button"
+            >
+                Logout
+            </button>
+
+        </aside>
+
+
+        <!-- MAIN CONTENT -->
+
+        <main class="main-content">
+
+
+            <header class="dashboard-header">
+
+                <div>
+
+                    <h1>
+                        Dashboard
+                    </h1>
+
+                    <p id="welcomeMessage">
+                        Welcome
+                    </p>
+
+                </div>
+
+            </header>
+
+
+            <!-- ADMIN DASHBOARD -->
+
+            <section
+                id="adminDashboard"
+                class="dashboard-section"
+            >
+
+                <div class="stats-grid">
+
+
+                    <div class="stat-card">
+
+                        <h3>
+                            Total Employees
+                        </h3>
+
+                        <p id="totalEmployees">
+                            0
+                        </p>
+
+                    </div>
+
+
+                    <div class="stat-card">
+
+                        <h3>
+                            Active Employees
+                        </h3>
+
+                        <p id="activeEmployees">
+                            0
+                        </p>
+
+                    </div>
+
+
+                    <div class="stat-card">
+
+                        <h3>
+                            Departments
+                        </h3>
+
+                        <p id="totalDepartments">
+                            0
+                        </p>
+
+                    </div>
+
+
+                    <div class="stat-card">
+
+                        <h3>
+                            Today's Present
+                        </h3>
+
+                        <p id="presentToday">
+                            0
+                        </p>
+
+                    </div>
+
+
+                    <div class="stat-card">
+
+                        <h3>
+                            Today's Absent
+                        </h3>
+
+                        <p id="absentToday">
+                            0
+                        </p>
+
+                    </div>
+
+
+                    <div class="stat-card">
+
+                        <h3>
+                            Total Payroll
+                        </h3>
+
+                        <p id="totalPayroll">
+                            ₹0
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- EMPLOYEE DASHBOARD -->
+
+            <section
+                id="employeeDashboard"
+                class="dashboard-section"
+                style="display: none;"
+            >
+
+                <div class="profile-card">
+
+                    <h2>
+                        My Information
+                    </h2>
+
+                    <p>
+                        Employee ID:
+                        <strong id="employeeId">
+                            -
+                        </strong>
+                    </p>
+
+                    <p>
+                        Name:
+                        <strong id="employeeName">
+                            -
+                        </strong>
+                    </p>
+
+                    <p>
+                        Designation:
+                        <strong id="employeeDesignation">
+                            -
+                        </strong>
+                    </p>
+
+                    <p>
+                        Employment Status:
+                        <strong id="employeeStatus">
+                            -
+                        </strong>
+                    </p>
+
+                </div>
+
+
+                <div class="profile-card">
+
+                    <h2>
+                        Today's Attendance
+                    </h2>
+
+                    <p id="attendanceStatus">
+                        No attendance recorded.
+                    </p>
+
+                </div>
+
+
+                <div class="profile-card">
+
+                    <h2>
+                        Salary
+                    </h2>
+
+                    <p>
+                        Basic Salary:
+                        <strong id="basicSalary">
+                            -
+                        </strong>
+                    </p>
+
+                    <p>
+                        Allowances:
+                        <strong id="allowances">
+                            -
+                        </strong>
+                    </p>
+
+                    <p>
+                        Deductions:
+                        <strong id="deductions">
+                            -
+                        </strong>
+                    </p>
+
+                    <p>
+                        Net Salary:
+                        <strong id="netSalary">
+                            -
+                        </strong>
+                    </p>
+
+                </div>
+
+            </section>
+
+
+        </main>
+
+    </div>
+
+
+    <script src="/static/js/app.js"></script>
+
+</body>
+
+</html>

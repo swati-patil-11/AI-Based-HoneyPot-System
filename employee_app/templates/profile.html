@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>My Profile</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/css/style.css"
+    >
+
+</head>
+
+
+<body>
+
+<div class="dashboard-layout">
+
+    <!-- =====================================================
+         SIDEBAR
+         ===================================================== -->
+
+    <aside class="sidebar">
+
+        <h2>Employee System</h2>
+
+        <nav>
+
+            <a href="/dashboard">
+                Dashboard
+            </a>
+
+            <a href="/employees-page">
+                Employees
+            </a>
+
+            <a href="/departments-page">
+                Departments
+            </a>
+
+            <a href="/attendance-page">
+                Attendance
+            </a>
+
+            <a href="/payroll-page">
+                Payroll
+            </a>
+
+            <a href="/profile-page">
+                My Profile
+            </a>
+
+        </nav>
+
+        <button
+            id="logoutButton"
+            class="logout-button"
+        >
+            Logout
+        </button>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+         ===================================================== -->
+
+    <main class="main-content">
+
+        <header class="dashboard-header">
+
+            <div>
+
+                <h1>
+                    My Profile
+                </h1>
+
+                <p id="profilePageWelcome">
+                    Employee Profile
+                </p>
+
+            </div>
+
+        </header>
+
+
+        <!-- =================================================
+             PROFILE CONTENT
+             ================================================= -->
+
+        <section
+            id="profileContent"
+            class="dashboard-section"
+            style="display: none;"
+        >
+
+            <!-- Basic Information -->
+
+            <div class="profile-card">
+
+                <h2>
+                    Employee Information
+                </h2>
+
+                <div class="profile-info-grid">
+
+                    <div class="profile-info-item">
+
+                        <span>
+                            Employee ID
+                        </span>
+
+                        <strong id="profileEmployeeId">
+                            -
+                        </strong>
+
+                    </div>
+
+
+                    <div class="profile-info-item">
+
+                        <span>
+                            Username
+                        </span>
+
+                        <strong id="profileUsername">
+                            -
+                        </strong>
+
+                    </div>
+
+
+                    <div class="profile-info-item">
+
+                        <span>
+                            Email
+                        </span>
+
+                        <strong id="profileEmail">
+                            -
+                        </strong>
+
+                    </div>
+
+
+                    <div class="profile-info-item">
+
+                        <span>
+                            Designation
+                        </span>
+
+                        <strong id="profileDesignation">
+                            -
+                        </strong>
+
+                    </div>
+
+
+                    <div class="profile-info-item">
+
+                        <span>
+                            Department ID
+                        </span>
+
+                        <strong id="profileDepartment">
+                            -
+                        </strong>
+
+                    </div>
+
+
+                    <div class="profile-info-item">
+
+                        <span>
+                            Joining Date
+                        </span>
+
+                        <strong id="profileJoiningDate">
+                            -
+                        </strong>
+
+                    </div>
+
+
+                    <div class="profile-info-item">
+
+                        <span>
+                            Employment Status
+                        </span>
+
+                        <strong id="profileEmploymentStatus">
+                            -
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Editable Information -->
+
+            <div class="profile-card">
+
+                <h2>
+                    Update Personal Information
+                </h2>
+
+                <p class="profile-description">
+                    You can update your name and phone number.
+                </p>
+
+
+                <form id="profileForm">
+
+                    <div class="form-grid profile-form-grid">
+
+                        <div class="form-group">
+
+                            <label for="profileFirstName">
+                                First Name
+                            </label>
+
+                            <input
+                                type="text"
+                                id="profileFirstName"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="profileLastName">
+                                Last Name
+                            </label>
+
+                            <input
+                                type="text"
+                                id="profileLastName"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="profilePhone">
+                                Phone
+                            </label>
+
+                            <input
+                                type="text"
+                                id="profilePhone"
+                                placeholder="9876543210"
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-actions">
+
+                        <button
+                            type="submit"
+                            class="btn-primary"
+                            id="updateProfileButton"
+                        >
+                            Save Changes
+                        </button>
+
+                    </div>
+
+                </form>
+
+
+                <div
+                    id="profileFormMessage"
+                    class="message"
+                ></div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             ACCESS DENIED
+             ================================================= -->
+
+        <section
+            id="profileAccessDenied"
+            class="profile-card"
+            style="display: none;"
+        >
+
+            <h2>
+                Profile Not Available
+            </h2>
+
+            <p>
+                Your employee profile is not linked
+                to this account.
+            </p>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<script src="/static/js/app.js"></script>
+
+<script src="/static/js/profile.js"></script>
+
+</body>
+
+</html>
