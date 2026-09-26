@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>User Management - Employee System</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/css/style.css"
+    >
+</head>
+
+
+<body>
+
+<div class="app-layout">
+
+    <!-- ======================================================
+         SIDEBAR
+         ====================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-brand">
+            Employee<br>
+            System
+        </div>
+
+        <nav>
+            <!-- app.js creates role-based navigation -->
+        </nav>
+
+    </aside>
+
+
+    <!-- ======================================================
+         MAIN CONTENT
+         ====================================================== -->
+
+    <main class="main-content">
+
+        <!-- Page Header -->
+
+        <header class="page-header">
+
+            <div>
+                <h1>User Management</h1>
+
+                <p>
+                    Manage system users and access roles.
+                </p>
+            </div>
+
+            <div class="role-badge">
+                Role:
+                <strong data-current-role>ADMIN</strong>
+            </div>
+
+        </header>
+
+
+        <!-- ==================================================
+             CREATE USER
+             ================================================== -->
+
+        <section class="dashboard-panel">
+
+            <h2>Create User</h2>
+
+            <p>
+                Create an administrator, HR user,
+                or employee login.
+            </p>
+
+
+            <form id="createUserForm">
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+
+                        <label for="newUsername">
+                            Username
+                        </label>
+
+                        <input
+                            type="text"
+                            id="newUsername"
+                            placeholder="Enter username"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="newEmail">
+                            Email
+                        </label>
+
+                        <input
+                            type="email"
+                            id="newEmail"
+                            placeholder="Enter email"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="newPassword">
+                            Password
+                        </label>
+
+                        <input
+                            type="password"
+                            id="newPassword"
+                            placeholder="Minimum 6 characters"
+                            minlength="6"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="newRole">
+                            Role
+                        </label>
+
+                        <select
+                            id="newRole"
+                            required
+                        >
+
+                            <option value="hr">
+                                HR
+                            </option>
+
+                            <option value="employee">
+                                Employee
+                            </option>
+
+                            <option value="admin">
+                                Admin
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="primary-button"
+                >
+                    Create User
+                </button>
+
+            </form>
+
+
+            <div
+                id="userMessage"
+                class="message"
+            ></div>
+
+        </section>
+
+
+        <!-- ==================================================
+             USER LIST
+             ================================================== -->
+
+        <section class="dashboard-panel">
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>
+                        System Users
+                    </h2>
+
+                    <p>
+                        All registered login accounts.
+                    </p>
+
+                </div>
+
+
+                <button
+                    id="refreshUsers"
+                    class="secondary-button"
+                >
+                    Refresh
+                </button>
+
+            </div>
+
+
+            <div
+                id="usersLoading"
+                class="info-message"
+            >
+                Loading users...
+            </div>
+
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                ID
+                            </th>
+
+                            <th>
+                                Username
+                            </th>
+
+                            <th>
+                                Email
+                            </th>
+
+                            <th>
+                                Role
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Actions
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="usersTableBody">
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- ========================================================
+     JAVASCRIPT
+     ======================================================== -->
+
+<script src="/static/js/app.js"></script>
+
+<script src="/static/js/users.js"></script>
+
+
+</body>
+
+</html>

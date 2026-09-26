@@ -22,7 +22,7 @@ from routes.role_test import router as role_test_router
 from routes.attendance import router as attendance_router
 from routes.salary import router as salary_router
 from routes.dashboard import router as dashboard_router
-
+from routes.users import router as users_router
 
 # ---------------------------------------------------------
 # Project directories
@@ -84,7 +84,7 @@ app.include_router(role_test_router)
 app.include_router(attendance_router)
 app.include_router(salary_router)
 app.include_router(dashboard_router)
-
+app.include_router(users_router)
 
 # ---------------------------------------------------------
 # Frontend pages
@@ -183,4 +183,12 @@ def profile_page(request: Request):
         context={
             "request": request
         }
+    )
+
+@app.get("/users-page", response_class=HTMLResponse)
+def users_page(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="users.html",
+        context={"request": request}
     )

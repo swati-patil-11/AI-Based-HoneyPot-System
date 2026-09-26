@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from database import get_db
 from dependencies import require_roles
+
 from models.employee import Employee
 from models.department import Department
 from models.attendance import Attendance
@@ -17,14 +18,14 @@ router = APIRouter(
 )
 
 
-# ============================================================
-# ADMIN / HR DASHBOARD
-# ============================================================
+# =========================================================
+# ADMIN DASHBOARD
+# =========================================================
 
 @router.get("/admin")
 def admin_dashboard(
     db: Session = Depends(get_db),
-    current_user=Depends(require_roles("admin", "hr"))
+    current_user=Depends(require_roles("admin"))
 ):
     total_employees = db.query(Employee).count()
 
@@ -77,6 +78,7 @@ def admin_dashboard(
     )
 
     return {
+        "role": "admin",
         "dashboard": {
             "total_employees": total_employees,
             "active_employees": active_employees,
@@ -93,9 +95,75 @@ def admin_dashboard(
     }
 
 
-# ============================================================
+# =========================================================
+# HR DASHBOARD
+# =========================================================
+
+@router.get("/hr")
+def hr_dashboard(
+    db: Session = Depends(get_db),
+    current_user=Depends(require_roles("hr"))
+):
+    total_employees = db.query(Employee).count()
+
+    active_employees = (
+        db.query(Employee)
+        .filter(Employee.employment_status == "Active")
+        .count()
+    )
+
+    total_departments = db.query(Department).count()
+
+    today = date.today()
+
+    present_today = (
+        db.query(Attendance)
+        .filter(
+            Attendance.attendance_date == today,
+            Attendance.status == "Present"
+        )
+        .count()
+    )
+
+    absent_today = (
+        db.query(Attendance)
+        .filter(
+            Attendance.attendance_date == today,
+            Attendance.status == "Absent"
+        )
+        .count()
+    )
+
+    leave_today = (
+        db.query(Attendance)
+        .filter(
+            Attendance.attendance_date == today,
+            Attendance.status == "Leave"
+        )
+        .count()
+    )
+
+    total_salary_records = db.query(Salary).count()
+
+    return {
+        "role": "hr",
+        "dashboard": {
+            "total_employees": total_employees,
+            "active_employees": active_employees,
+            "total_departments": total_departments,
+            "attendance_today": {
+                "present": present_today,
+                "absent": absent_today,
+                "leave": leave_today
+            },
+            "total_salary_records": total_salary_records
+        }
+    }
+
+
+# =========================================================
 # EMPLOYEE DASHBOARD
-# ============================================================
+# =========================================================
 
 @router.get("/me")
 def employee_dashboard(
@@ -141,12 +209,15 @@ def employee_dashboard(
         )
 
     return {
+        "role": "employee",
         "employee": {
             "employee_id": employee.employee_id,
             "name": f"{employee.first_name} {employee.last_name}",
             "email": employee.email,
+            "phone": employee.phone,
             "designation": employee.designation,
             "department_id": employee.department_id,
+            "joining_date": employee.joining_date,
             "employment_status": employee.employment_status
         },
         "today_attendance": (
