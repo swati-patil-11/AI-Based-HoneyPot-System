@@ -1,12 +1,7 @@
-// ============================================================
-// Employee Management System - Global App JavaScript
-// Role-Based Navigation + Authentication
-// ============================================================
 
-
-// ------------------------------------------------------------
-// Authentication helpers
-// ------------------------------------------------------------
+// ============================================================
+// GLOBAL AUTHENTICATION HELPERS
+// ============================================================
 
 function getToken() {
     return localStorage.getItem("access_token");
@@ -20,17 +15,12 @@ function getRole() {
     return localStorage.getItem("role") || "";
 }
 
-
-// ------------------------------------------------------------
-// API helper
-// ------------------------------------------------------------
-
 async function apiFetch(url, options = {}) {
-    const token = getToken();
-
     const headers = {
         ...(options.headers || {})
     };
+
+    const token = getToken();
 
     if (token) {
         headers["Authorization"] = `Bearer ${token}`;
@@ -47,23 +37,16 @@ async function apiFetch(url, options = {}) {
 }
 
 
-// ------------------------------------------------------------
-// Login
-// ------------------------------------------------------------
+// ============================================================
+// LOGIN
+// ============================================================
 
 async function handleLogin(event) {
     event.preventDefault();
 
-    const usernameInput = document.getElementById("username");
-    const passwordInput = document.getElementById("password");
+    const username = document.getElementById("username")?.value.trim();
+    const password = document.getElementById("password")?.value;
     const message = document.getElementById("loginMessage");
-
-    if (!usernameInput || !passwordInput) {
-        return;
-    }
-
-    const username = usernameInput.value.trim();
-    const password = passwordInput.value;
 
     if (!username || !password) {
         if (message) {
@@ -79,15 +62,15 @@ async function handleLogin(event) {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                username: username,
-                password: password
+                username,
+                password
             })
         });
 
         const data = await response.json();
 
         if (!response.ok) {
-            throw new Error(data.detail || "Login failed");
+            throw new Error(data.detail || "Login failed.");
         }
 
         localStorage.setItem("access_token", data.access_token);
@@ -98,15 +81,15 @@ async function handleLogin(event) {
 
     } catch (error) {
         if (message) {
-            message.textContent = error.message;
+            message.textContent = error.message || "Login failed.";
         }
     }
 }
 
 
-// ------------------------------------------------------------
-// Logout
-// ------------------------------------------------------------
+// ============================================================
+// LOGOUT
+// ============================================================
 
 function logout() {
     localStorage.removeItem("access_token");
@@ -117,9 +100,9 @@ function logout() {
 }
 
 
-// ------------------------------------------------------------
-// Role-based sidebar
-// ------------------------------------------------------------
+// ============================================================
+// ROLE-BASED SIDEBAR
+// ============================================================
 
 function configureSidebar() {
     const sidebar = document.querySelector(".sidebar");
@@ -133,463 +116,294 @@ function configureSidebar() {
 
     let navigation = "";
 
-    // --------------------------------------------------------
-    // ADMIN
-    // --------------------------------------------------------
-
-   if (role === "admin") {
-
-    navigation = `
-    <a href="/dashboard">
-        Dashboard
-    </a>
-
-    <a href="/employees-page">
-        Employees
-    </a>
-
-    <a href="/departments-page">
-        Departments
-    </a>
-
-    <a href="/attendance-page">
-        Attendance
-    </a>
-
-    <a href="/payroll-page">
-        Payroll
-    </a>
-
-    <a href="/users-page">
-        User Management
-    </a>
-
-    <a href="/profile-page">
-        My Profile
-    </a>
-`;
-}
-
-    // --------------------------------------------------------
-    // HR
-    // --------------------------------------------------------
-
-    else if (role === "hr") {
-
-       navigation = `
-    <a href="/dashboard">
-        Dashboard
-    </a>
-
-    <a href="/employees-page">
-        Employees
-    </a>
-
-    <a href="/departments-page">
-        Departments
-    </a>
-
-    <a href="/attendance-page">
-        Attendance
-    </a>
-
-    <a href="/payroll-page">
-        Payroll
-    </a>
-`;
-    }
-
-
-    // --------------------------------------------------------
-    // No valid role
-    // --------------------------------------------------------
-
-    else {
-
+    if (role === "admin") {
         navigation = `
-            <a href="/">
-                Login
-            </a>
+            <a href="/dashboard">Dashboard</a>
+            <a href="/employees-page">Employees</a>
+            <a href="/departments-page">Departments</a>
+            <a href="/attendance-page">Attendance</a>
+            <a href="/payroll-page">Payroll</a>
+            <a href="/users-page">User Management</a>
+        `;
 
-            <a href="/register">
-                Register
-            </a>
+    } else if (role === "hr") {
+        navigation = `
+            <a href="/dashboard">Dashboard</a>
+            <a href="/employees-page">Employees</a>
+            <a href="/attendance-page">Attendance</a>
+            <a href="/payroll-page">Payroll</a>
+            <a href="/profile-page">My Profile</a>
+        `;
+
+    } else if (role === "employee") {
+        navigation = `
+            <a href="/dashboard">Dashboard</a>
+            <a href="/attendance-page">My Attendance</a>
+            <a href="/payroll-page">My Salary</a>
+            <a href="/profile-page">My Profile</a>
+        `;
+
+    } else {
+        navigation = `
+            <a href="/">Login</a>
+            <a href="/register">Register</a>
         `;
     }
 
+    // Create or update navigation.
+    let nav = sidebar.querySelector("nav");
 
-    // Keep the Employee System heading,
-    // replace only the navigation area.
+    if (!nav) {
+        nav = document.createElement("nav");
+        sidebar.appendChild(nav);
+    }
 
-    const existingNav = sidebar.querySelector("nav");
-
-    if (existingNav) {
-    existingNav.innerHTML = navigation;
-} else {
-    const nav = document.createElement("nav");
     nav.innerHTML = navigation;
-    sidebar.appendChild(nav);
-}
 
+    // Highlight the current page.
+    const currentPath = window.location.pathname;
 
-// ------------------------------------------------------------
-// Red Logout button
-// ------------------------------------------------------------
+    nav.querySelectorAll("a").forEach((link) => {
+        if (link.getAttribute("href") === currentPath) {
+            link.classList.add("active");
+        }
+    });
 
-let logoutButton = sidebar.querySelector(".sidebar-logout");
+    // Remove all old logout links and buttons.
+    sidebar.querySelectorAll("a, button").forEach((element) => {
+        const text = element.textContent.trim().toLowerCase();
 
-if (!logoutButton) {
+        if (
+            text === "logout" ||
+            element.id === "logoutButton" ||
+            element.classList.contains("sidebar-logout")
+        ) {
+            element.remove();
+        }
+    });
 
-    logoutButton = document.createElement("a");
+    // Create exactly ONE logout button.
+    const logoutButton = document.createElement("button");
 
-    logoutButton.href = "#";
-    logoutButton.className = "sidebar-logout";
+    logoutButton.type = "button";
+    logoutButton.id = "logoutButton";
+    logoutButton.className = "logout-button";
     logoutButton.textContent = "Logout";
 
-    logoutButton.addEventListener("click", function (event) {
-        event.preventDefault();
-        logout();
-    });
+    logoutButton.addEventListener("click", logout);
 
     sidebar.appendChild(logoutButton);
-}
 
-    // --------------------------------------------------------
-    // Update welcome text
-    // --------------------------------------------------------
-
-    const welcomeElements = document.querySelectorAll(
-        "[data-current-user]"
-    );
-
-    welcomeElements.forEach(element => {
-        element.textContent = username;
+    // Update username.
+    document.querySelectorAll("[data-current-user]").forEach((element) => {
+        element.textContent = username || "User";
     });
 
-
-    // --------------------------------------------------------
-    // Update role badge
-    // --------------------------------------------------------
-
-    const roleElements = document.querySelectorAll(
-        "[data-current-role]"
-    );
-
-    roleElements.forEach(element => {
-        element.textContent = role.toUpperCase();
+    // Update role badge.
+    document.querySelectorAll("[data-current-role]").forEach((element) => {
+        element.textContent = role ? role.toUpperCase() : "-";
     });
 }
 
 
-// ------------------------------------------------------------
-// Dashboard loading
-// ------------------------------------------------------------
+// ============================================================
+// DASHBOARD HELPERS
+// ============================================================
+
+function setText(id, value) {
+    const element = document.getElementById(id);
+
+    if (!element) {
+        return;
+    }
+
+    element.textContent =
+        value === null || value === undefined
+            ? "-"
+            : value;
+}
+
+function formatCurrency(value) {
+    const amount = Number(value ?? 0);
+
+    return new Intl.NumberFormat("en-IN", {
+        style: "currency",
+        currency: "INR",
+        maximumFractionDigits: 0
+    }).format(Number.isFinite(amount) ? amount : 0);
+}
+
+
+// ============================================================
+// LOAD ROLE-SPECIFIC DASHBOARD
+// ============================================================
 
 async function loadDashboard() {
-
     const role = getRole();
-    const username = getUsername();
 
-    if (!role || !getToken()) {
+    if (!getToken() || !role) {
         window.location.href = "/";
         return;
     }
 
-    const usernameElements = document.querySelectorAll(
-        "[data-current-user]"
-    );
+    const adminDashboard = document.getElementById("adminDashboard");
+    const hrDashboard = document.getElementById("hrDashboard");
+    const employeeDashboard = document.getElementById("employeeDashboard");
 
-    usernameElements.forEach(element => {
-        element.textContent = username;
+    // Hide all dashboard sections first.
+    [adminDashboard, hrDashboard, employeeDashboard].forEach((section) => {
+        if (section) {
+            section.style.display = "none";
+        }
     });
 
-    const roleElements = document.querySelectorAll(
-        "[data-current-role]"
-    );
+    let endpoint = "";
 
-    roleElements.forEach(element => {
-        element.textContent = role.toUpperCase();
-    });
+    if (role === "admin") {
+        endpoint = "/dashboard/admin";
+    } else if (role === "hr") {
+        endpoint = "/dashboard/hr";
+    } else if (role === "employee") {
+        endpoint = "/dashboard/me";
+    } else {
+        window.location.href = "/";
+        return;
+    }
 
+    setText("dashboardRole", role.toUpperCase());
+    setText("welcomeMessage", `Welcome, ${getUsername()}`);
 
     try {
-
-        let endpoint = "";
-
-        if (role === "admin") {
-            endpoint = "/dashboard/admin";
-        }
-
-        else if (role === "hr") {
-            endpoint = "/dashboard/hr";
-        }
-
-        else if (role === "employee") {
-            endpoint = "/dashboard/me";
-        }
-
-        else {
-            throw new Error("Invalid user role");
-        }
-
-
         const response = await apiFetch(endpoint);
 
-        if (!response.ok) {
-
-            if (response.status === 401) {
-                logout();
-                return;
-            }
-
-            const errorData = await response.json();
-            throw new Error(
-                errorData.detail || "Unable to load dashboard"
-            );
+        if (response.status === 401) {
+            logout();
+            return;
         }
 
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+
+            throw new Error(
+                errorData.detail || "Unable to load dashboard."
+            );
+        }
 
         const data = await response.json();
 
-        // Hide all dashboard sections first.
-
-        const adminDashboard =
-            document.getElementById("adminDashboard");
-
-        const hrDashboard =
-            document.getElementById("hrDashboard");
-
-        const employeeDashboard =
-            document.getElementById("employeeDashboard");
-
-        if (adminDashboard) {
-            adminDashboard.style.display = "none";
-        }
-
-        if (hrDashboard) {
-            hrDashboard.style.display = "none";
-        }
-
-        if (employeeDashboard) {
-            employeeDashboard.style.display = "none";
-        }
-
-
-        // Show correct dashboard.
+        // ----------------------------------------------------
+        // ADMIN DASHBOARD
+        // ----------------------------------------------------
 
         if (role === "admin" && adminDashboard) {
-
             adminDashboard.style.display = "block";
 
-            const dashboard = data.dashboard;
+            const dashboard = data.dashboard || {};
+            const attendance = dashboard.attendance_today || {};
 
-            setText("totalEmployees", dashboard.total_employees);
-            setText("activeEmployees", dashboard.active_employees);
-            setText("totalDepartments", dashboard.total_departments);
+            setText("totalEmployees", dashboard.total_employees ?? 0);
+            setText("activeEmployees", dashboard.active_employees ?? 0);
+            setText("totalDepartments", dashboard.total_departments ?? 0);
 
-            setText(
-                "presentToday",
-                dashboard.attendance_today.present
-            );
+            setText("presentToday", attendance.present ?? 0);
+            setText("absentToday", attendance.absent ?? 0);
+            setText("leaveToday", attendance.leave ?? 0);
 
-            setText(
-                "absentToday",
-                dashboard.attendance_today.absent
-            );
-
-            setText(
-                "leaveToday",
-                dashboard.attendance_today.leave
-            );
-
-            setText(
-                "salaryRecords",
-                dashboard.total_salary_records
-            );
+            // Support both IDs used in dashboard versions.
+            setText("salaryRecords", dashboard.total_salary_records ?? 0);
+            setText("totalSalaryRecords", dashboard.total_salary_records ?? 0);
 
             setText(
                 "totalPayroll",
-                formatCurrency(dashboard.total_payroll)
+                formatCurrency(dashboard.total_payroll ?? 0)
             );
         }
 
+        // ----------------------------------------------------
+        // HR DASHBOARD
+        // ----------------------------------------------------
 
-        else if (role === "hr" && hrDashboard) {
-
+        if (role === "hr" && hrDashboard) {
             hrDashboard.style.display = "block";
 
-            const dashboard = data.dashboard;
+            const dashboard = data.dashboard || {};
+            const attendance = dashboard.attendance_today || {};
 
-            setText("hrTotalEmployees", dashboard.total_employees);
-            setText("hrActiveEmployees", dashboard.active_employees);
-            setText("hrTotalDepartments", dashboard.total_departments);
+            setText("hrTotalEmployees", dashboard.total_employees ?? 0);
+            setText("hrActiveEmployees", dashboard.active_employees ?? 0);
+            setText("hrTotalDepartments", dashboard.total_departments ?? 0);
 
-            setText(
-                "hrPresentToday",
-                dashboard.attendance_today.present
-            );
+            setText("hrPresentToday", attendance.present ?? 0);
+            setText("hrAbsentToday", attendance.absent ?? 0);
+            setText("hrLeaveToday", attendance.leave ?? 0);
 
-            setText(
-                "hrAbsentToday",
-                dashboard.attendance_today.absent
-            );
-
-            setText(
-                "hrLeaveToday",
-                dashboard.attendance_today.leave
-            );
-
-            setText(
-                "hrSalaryRecords",
-                dashboard.total_salary_records
-            );
+            setText("hrSalaryRecords", dashboard.total_salary_records ?? 0);
         }
 
+        // ----------------------------------------------------
+        // EMPLOYEE DASHBOARD
+        // ----------------------------------------------------
 
-        else if (role === "employee" && employeeDashboard) {
-
+        if (role === "employee" && employeeDashboard) {
             employeeDashboard.style.display = "block";
 
-            const employee = data.employee;
+            const employee = data.employee || {};
+
+            setText("employeeId", employee.employee_id);
+            setText("employeeName", employee.name);
+            setText("employeeEmail", employee.email);
+            setText("employeeDesignation", employee.designation);
+            setText("employeeDepartment", employee.department_id);
+            setText("employeeStatus", employee.employment_status);
+
+            const attendanceStatus =
+                data.today_attendance?.status || "Not marked";
+
+            setText("todayAttendance", attendanceStatus);
+            setText("employeeAttendanceStatus", attendanceStatus);
+
+            const netSalary = data.salary?.net_salary;
 
             setText(
-                "employeeId",
-                employee.employee_id
+                "employeeNetSalary",
+                netSalary == null ? "Not available" : formatCurrency(netSalary)
             );
-
-            setText(
-                "employeeName",
-                employee.name
-            );
-
-            setText(
-                "employeeEmail",
-                employee.email
-            );
-
-            setText(
-                "employeeDesignation",
-                employee.designation
-            );
-
-            setText(
-                "employeeDepartment",
-                employee.department_id
-            );
-
-            setText(
-                "employeeStatus",
-                employee.employment_status
-            );
-
-
-            if (data.today_attendance) {
-
-                setText(
-                    "todayAttendance",
-                    data.today_attendance.status
-                );
-
-            } else {
-
-                setText(
-                    "todayAttendance",
-                    "Not marked"
-                );
-            }
-
-
-            if (data.salary) {
-
-                setText(
-                    "employeeNetSalary",
-                    formatCurrency(data.salary.net_salary)
-                );
-
-            } else {
-
-                setText(
-                    "employeeNetSalary",
-                    "Not available"
-                );
-            }
         }
 
-
     } catch (error) {
-
         console.error("Dashboard error:", error);
 
-        const errorElement =
-            document.getElementById("dashboardError");
+        const errorElement = document.getElementById("dashboardError");
 
         if (errorElement) {
-            errorElement.textContent = error.message;
+            errorElement.textContent =
+                error.message || "Unable to load dashboard.";
+
             errorElement.style.display = "block";
         }
     }
 }
 
 
-// ------------------------------------------------------------
-// Utility functions
-// ------------------------------------------------------------
+// ============================================================
+// PAGE INITIALIZATION
+// ============================================================
 
-function setText(id, value) {
-
-    const element = document.getElementById(id);
-
-    if (element) {
-        element.textContent = value ?? "";
-    }
-}
-
-
-function formatCurrency(value) {
-
-    if (value === null || value === undefined) {
-        return "₹0";
-    }
-
-    return new Intl.NumberFormat("en-IN", {
-        style: "currency",
-        currency: "INR",
-        maximumFractionDigits: 0
-    }).format(value);
-}
-
-
-// ------------------------------------------------------------
-// Page initialization
-// ------------------------------------------------------------
-
-document.addEventListener("DOMContentLoaded", function () {
-
-    const token = getToken();
-
-    // Configure role-based sidebar on EVERY page.
+document.addEventListener("DOMContentLoaded", () => {
     configureSidebar();
 
-
-    // Login page
     const loginForm = document.getElementById("loginForm");
 
     if (loginForm) {
         loginForm.addEventListener("submit", handleLogin);
     }
 
-
-    // Dashboard page
-    if (
+    const isDashboardPage =
         document.getElementById("adminDashboard") ||
         document.getElementById("hrDashboard") ||
-        document.getElementById("employeeDashboard")
-    ) {
-        if (!token) {
-            window.location.href = "/";
-            return;
-        }
+        document.getElementById("employeeDashboard");
 
+    if (isDashboardPage) {
         loadDashboard();
     }
 });
