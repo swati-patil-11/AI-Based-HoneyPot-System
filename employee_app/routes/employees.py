@@ -1,3 +1,4 @@
+import re
 from datetime import date
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -15,6 +16,66 @@ router = APIRouter(
     prefix="/employees",
     tags=["Employees"]
 )
+
+
+# ============================================================
+# VALIDATION PATTERNS
+# ============================================================
+
+NAME_PATTERN = re.compile(r"^[A-Za-z]+$")
+PHONE_PATTERN = re.compile(r"^\d{10}$")
+
+
+def validate_name(value: str, field_name: str) -> str:
+    """
+    Validate fields that must contain letters only.
+    Examples:
+    John      -> valid
+    Priya     -> valid
+    John123   -> invalid
+    John@     -> invalid
+    John Doe  -> invalid
+    """
+
+    value = value.strip()
+
+    if not value:
+        raise HTTPException(
+            status_code=400,
+            detail=f"{field_name} is required"
+        )
+
+    if not NAME_PATTERN.fullmatch(value):
+        raise HTTPException(
+            status_code=400,
+            detail=f"{field_name} must contain characters only"
+        )
+
+    return value
+
+
+def validate_phone(value: str | None) -> str | None:
+    """
+    Validate phone number.
+    Phone is optional, but if provided it must contain
+    exactly 10 digits.
+    """
+
+    if value is None:
+        return None
+
+    value = value.strip()
+
+    if value == "":
+        return None
+
+    if not PHONE_PATTERN.fullmatch(value):
+        raise HTTPException(
+            status_code=400,
+            detail="Phone number must contain exactly 10 digits"
+        )
+
+    return value
 
 
 # ============================================================
@@ -65,7 +126,68 @@ def create_employee(
     db: Session = Depends(get_db),
     current_user=Depends(require_roles("admin", "hr"))
 ):
-    # Check department
+    # --------------------------------------------------------
+    # Validate First Name
+    # --------------------------------------------------------
+
+    first_name = validate_name(
+        employee_data.first_name,
+        "First Name"
+    )
+
+    # --------------------------------------------------------
+    # Validate Last Name
+    # --------------------------------------------------------
+
+    last_name = validate_name(
+        employee_data.last_name,
+        "Last Name"
+    )
+
+    # --------------------------------------------------------
+    # Validate Designation
+    # --------------------------------------------------------
+
+    designation = validate_name(
+        employee_data.designation,
+        "Designation"
+    )
+
+    # --------------------------------------------------------
+    # Validate Phone
+    # --------------------------------------------------------
+
+    phone = validate_phone(employee_data.phone)
+
+    # --------------------------------------------------------
+    # Clean Employee ID
+    # Employee ID remains VARCHAR / string
+    # --------------------------------------------------------
+
+    employee_id = employee_data.employee_id.strip()
+
+    if not employee_id:
+        raise HTTPException(
+            status_code=400,
+            detail="Employee ID is required"
+        )
+
+    # --------------------------------------------------------
+    # Clean Email
+    # --------------------------------------------------------
+
+    email = employee_data.email.strip()
+
+    if not email:
+        raise HTTPException(
+            status_code=400,
+            detail="Email is required"
+        )
+
+    # --------------------------------------------------------
+    # Check Department
+    # --------------------------------------------------------
+
     department = (
         db.query(Department)
         .filter(Department.id == employee_data.department_id)
@@ -78,10 +200,13 @@ def create_employee(
             detail="Department not found"
         )
 
-    # Check duplicate employee ID
+    # --------------------------------------------------------
+    # Check Duplicate Employee ID
+    # --------------------------------------------------------
+
     existing_employee = (
         db.query(Employee)
-        .filter(Employee.employee_id == employee_data.employee_id)
+        .filter(Employee.employee_id == employee_id)
         .first()
     )
 
@@ -91,10 +216,13 @@ def create_employee(
             detail="Employee ID already exists"
         )
 
-    # Check duplicate email
+    # --------------------------------------------------------
+    # Check Duplicate Email
+    # --------------------------------------------------------
+
     existing_email = (
         db.query(Employee)
-        .filter(Employee.email == employee_data.email)
+        .filter(Employee.email == email)
         .first()
     )
 
@@ -104,15 +232,18 @@ def create_employee(
             detail="Employee email already exists"
         )
 
-    # Create employee
+    # --------------------------------------------------------
+    # Create Employee
+    # --------------------------------------------------------
+
     new_employee = Employee(
-        employee_id=employee_data.employee_id,
-        first_name=employee_data.first_name,
-        last_name=employee_data.last_name,
-        email=employee_data.email,
-        phone=employee_data.phone,
+        employee_id=employee_id,
+        first_name=first_name,
+        last_name=last_name,
+        email=email,
+        phone=phone,
         department_id=employee_data.department_id,
-        designation=employee_data.designation,
+        designation=designation,
         joining_date=employee_data.joining_date,
         employment_status=employee_data.employment_status
     )
@@ -297,17 +428,34 @@ def update_my_employee_profile(
             detail="Employee profile not linked to this user"
         )
 
-    # Update first name
+    # --------------------------------------------------------
+    # Update First Name
+    # --------------------------------------------------------
+
     if employee_data.first_name is not None:
-        employee.first_name = employee_data.first_name
+        employee.first_name = validate_name(
+            employee_data.first_name,
+            "First Name"
+        )
 
-    # Update last name
+    # --------------------------------------------------------
+    # Update Last Name
+    # --------------------------------------------------------
+
     if employee_data.last_name is not None:
-        employee.last_name = employee_data.last_name
+        employee.last_name = validate_name(
+            employee_data.last_name,
+            "Last Name"
+        )
 
-    # Update phone
+    # --------------------------------------------------------
+    # Update Phone
+    # --------------------------------------------------------
+
     if employee_data.phone is not None:
-        employee.phone = employee_data.phone
+        employee.phone = validate_phone(
+            employee_data.phone
+        )
 
     db.commit()
     db.refresh(employee)
@@ -379,11 +527,16 @@ def update_employee(
             detail="Employee not found"
         )
 
-    # Update department
+    # --------------------------------------------------------
+    # Update Department
+    # --------------------------------------------------------
+
     if employee_data.department_id is not None:
         department = (
             db.query(Department)
-            .filter(Department.id == employee_data.department_id)
+            .filter(
+                Department.id == employee_data.department_id
+            )
             .first()
         )
 
@@ -395,20 +548,43 @@ def update_employee(
 
         employee.department_id = employee_data.department_id
 
-    # Update first name
+    # --------------------------------------------------------
+    # Update First Name
+    # --------------------------------------------------------
+
     if employee_data.first_name is not None:
-        employee.first_name = employee_data.first_name
+        employee.first_name = validate_name(
+            employee_data.first_name,
+            "First Name"
+        )
 
-    # Update last name
+    # --------------------------------------------------------
+    # Update Last Name
+    # --------------------------------------------------------
+
     if employee_data.last_name is not None:
-        employee.last_name = employee_data.last_name
+        employee.last_name = validate_name(
+            employee_data.last_name,
+            "Last Name"
+        )
 
-    # Update email
+    # --------------------------------------------------------
+    # Update Email
+    # --------------------------------------------------------
+
     if employee_data.email is not None:
+        email = employee_data.email.strip()
+
+        if not email:
+            raise HTTPException(
+                status_code=400,
+                detail="Email cannot be empty"
+            )
+
         existing_email = (
             db.query(Employee)
             .filter(
-                Employee.email == employee_data.email,
+                Employee.email == email,
                 Employee.id != employee_id
             )
             .first()
@@ -420,30 +596,60 @@ def update_employee(
                 detail="Employee email already exists"
             )
 
-        employee.email = employee_data.email
+        employee.email = email
 
-    # Update phone
+    # --------------------------------------------------------
+    # Update Phone
+    # --------------------------------------------------------
+
     if employee_data.phone is not None:
-        employee.phone = employee_data.phone
+        employee.phone = validate_phone(
+            employee_data.phone
+        )
 
-    # Update designation
+    # --------------------------------------------------------
+    # Update Designation
+    # --------------------------------------------------------
+
     if employee_data.designation is not None:
-        employee.designation = employee_data.designation
+        employee.designation = validate_name(
+            employee_data.designation,
+            "Designation"
+        )
 
-    # Update joining date
+    # --------------------------------------------------------
+    # Update Joining Date
+    # --------------------------------------------------------
+
     if employee_data.joining_date is not None:
         employee.joining_date = employee_data.joining_date
 
-    # Update employment status
+    # --------------------------------------------------------
+    # Update Employment Status
+    # --------------------------------------------------------
+
     if employee_data.employment_status is not None:
-        employee.employment_status = employee_data.employment_status
+        employee.employment_status = (
+            employee_data.employment_status.strip()
+        )
 
     db.commit()
     db.refresh(employee)
 
     return {
         "message": "Employee updated successfully",
-        "employee": employee
+        "employee": {
+            "id": employee.id,
+            "employee_id": employee.employee_id,
+            "first_name": employee.first_name,
+            "last_name": employee.last_name,
+            "email": employee.email,
+            "phone": employee.phone,
+            "department_id": employee.department_id,
+            "designation": employee.designation,
+            "joining_date": employee.joining_date,
+            "employment_status": employee.employment_status
+        }
     }
 
 

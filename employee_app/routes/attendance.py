@@ -1,6 +1,6 @@
 from datetime import date
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
@@ -26,7 +26,7 @@ class AttendanceCreate(BaseModel):
 
 
 # ============================================================
-# MARK ATTENDANCE
+# MARK OWN ATTENDANCE
 # EMPLOYEE ONLY
 # ============================================================
 
@@ -65,7 +65,11 @@ def mark_attendance(
             detail="Attendance already marked for today"
         )
 
-    allowed_statuses = ["Present", "Absent", "Leave"]
+    allowed_statuses = [
+        "Present",
+        "Absent",
+        "Leave"
+    ]
 
     if attendance_data.status not in allowed_statuses:
         raise HTTPException(
@@ -120,28 +124,118 @@ def get_my_attendance(
 
     attendance_records = (
         db.query(Attendance)
-        .filter(Attendance.employee_id == employee.id)
-        .order_by(Attendance.attendance_date.desc())
+        .filter(
+            Attendance.employee_id == employee.id
+        )
+        .order_by(
+            Attendance.attendance_date.desc()
+        )
         .all()
     )
 
-    return attendance_records
+    return {
+        "attendance": attendance_records
+    }
 
 
 # ============================================================
 # GET ALL ATTENDANCE
 # ADMIN + HR
+#
+# Optional filters:
+# attendance_date=YYYY-MM-DD
+# employee_id=1
 # ============================================================
 
 @router.get("/")
 def get_all_attendance(
+    attendance_date: date | None = Query(
+        default=None
+    ),
+    employee_id: int | None = Query(
+        default=None,
+        ge=1
+    ),
     db: Session = Depends(get_db),
-    current_user=Depends(require_roles("admin", "hr"))
-):
-    attendance_records = (
-        db.query(Attendance)
-        .order_by(Attendance.attendance_date.desc())
-        .all()
+    current_user=Depends(
+        require_roles("admin", "hr")
     )
+):
+
+    # --------------------------------------------------------
+    # Build query
+    # --------------------------------------------------------
+
+    query = (
+        db.query(
+            Attendance,
+            Employee
+        )
+        .join(
+            Employee,
+            Attendance.employee_id == Employee.id
+        )
+    )
+
+    # --------------------------------------------------------
+    # Date filter
+    # --------------------------------------------------------
+
+    if attendance_date is not None:
+        query = query.filter(
+            Attendance.attendance_date ==
+            attendance_date
+        )
+
+    # --------------------------------------------------------
+    # Employee filter
+    # --------------------------------------------------------
+
+    if employee_id is not None:
+        query = query.filter(
+            Attendance.employee_id ==
+            employee_id
+        )
+
+    # --------------------------------------------------------
+    # Latest attendance first
+    # --------------------------------------------------------
+
+    query = query.order_by(
+        Attendance.attendance_date.desc(),
+        Attendance.id.desc()
+    )
+
+    results = query.all()
+
+    # --------------------------------------------------------
+    # Format response for frontend
+    # --------------------------------------------------------
+
+    attendance_records = []
+
+    for attendance, employee in results:
+
+        attendance_records.append({
+            "attendance_id": attendance.id,
+
+            "employee_id": employee.id,
+
+            "employee_code": employee.employee_id,
+
+            "employee_name": (
+                f"{employee.first_name} "
+                f"{employee.last_name}"
+            ).strip(),
+
+            "attendance_date":
+                attendance.attendance_date,
+
+            "status":
+                attendance.status,
+
+            "remarks":
+                attendance.remarks
+        })
 
     return attendance_records

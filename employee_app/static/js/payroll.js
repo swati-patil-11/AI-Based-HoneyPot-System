@@ -1,36 +1,36 @@
 // =========================================================
-// PAYROLL MANAGEMENT UI
+// PAYROLL MANAGEMENT
 // =========================================================
 
 
-// ---------------------------------------------------------
-// Detect Payroll Page
-// ---------------------------------------------------------
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
 
-const employeePayrollSection =
-    document.getElementById(
-        "employeePayrollSection"
-    );
+        const employeeSection =
+            document.getElementById(
+                "employeePayrollSection"
+            );
 
-const adminPayrollSection =
-    document.getElementById(
-        "adminPayrollSection"
-    );
+        const adminSection =
+            document.getElementById(
+                "adminPayrollSection"
+            );
+
+        if (
+            employeeSection ||
+            adminSection
+        ) {
+            initializePayrollPage();
+        }
+
+    }
+);
 
 
-if (
-    employeePayrollSection ||
-    adminPayrollSection
-) {
-
-    initializePayrollPage();
-
-}
-
-
-// ---------------------------------------------------------
-// Initialize Payroll Page
-// ---------------------------------------------------------
+// =========================================================
+// INITIALIZE
+// =========================================================
 
 function initializePayrollPage() {
 
@@ -50,22 +50,13 @@ function initializePayrollPage() {
         );
 
 
-    // -----------------------------------------------------
-    // Authentication
-    // -----------------------------------------------------
-
     if (!token) {
 
         window.location.href = "/";
 
         return;
-
     }
 
-
-    // -----------------------------------------------------
-    // Welcome
-    // -----------------------------------------------------
 
     const welcome =
         document.getElementById(
@@ -76,18 +67,9 @@ function initializePayrollPage() {
     if (welcome) {
 
         welcome.textContent =
-            "Welcome, " +
-            username +
-            " (" +
-            role +
-            ")";
-
+            `Welcome, ${username} (${role})`;
     }
 
-
-    // -----------------------------------------------------
-    // Employee
-    // -----------------------------------------------------
 
     if (role === "employee") {
 
@@ -96,11 +78,6 @@ function initializePayrollPage() {
         loadMySalary(token);
 
     }
-
-
-    // -----------------------------------------------------
-    // Admin / HR
-    // -----------------------------------------------------
 
     else if (
         role === "admin" ||
@@ -113,20 +90,13 @@ function initializePayrollPage() {
 
     }
 
-
-    // -----------------------------------------------------
-    // Other roles
-    // -----------------------------------------------------
-
     else {
 
         showPayrollAccessDenied();
-
     }
 
 
     setupPayrollEventListeners();
-
 }
 
 
@@ -153,28 +123,19 @@ function showEmployeePayroll() {
 
 
     if (employeeSection) {
-
         employeeSection.style.display =
             "block";
-
     }
-
 
     if (adminSection) {
-
         adminSection.style.display =
             "none";
-
     }
-
 
     if (deniedSection) {
-
         deniedSection.style.display =
             "none";
-
     }
-
 }
 
 
@@ -197,28 +158,19 @@ function showAdminPayroll() {
 
 
     if (employeeSection) {
-
         employeeSection.style.display =
             "none";
-
     }
-
 
     if (adminSection) {
-
         adminSection.style.display =
             "block";
-
     }
-
 
     if (deniedSection) {
-
         deniedSection.style.display =
             "none";
-
     }
-
 }
 
 
@@ -241,28 +193,19 @@ function showPayrollAccessDenied() {
 
 
     if (employeeSection) {
-
         employeeSection.style.display =
             "none";
-
     }
-
 
     if (adminSection) {
-
         adminSection.style.display =
             "none";
-
     }
-
 
     if (deniedSection) {
-
         deniedSection.style.display =
             "block";
-
     }
-
 }
 
 
@@ -284,7 +227,6 @@ function setupPayrollEventListeners() {
             "submit",
             createSalary
         );
-
     }
 
 
@@ -298,7 +240,7 @@ function setupPayrollEventListeners() {
 
         refreshButton.addEventListener(
             "click",
-            function () {
+            () => {
 
                 const token =
                     localStorage.getItem(
@@ -306,17 +248,14 @@ function setupPayrollEventListeners() {
                     );
 
                 loadAllSalaries(token);
-
             }
         );
-
     }
-
 }
 
 
 // =========================================================
-// EMPLOYEE SALARY
+// LOAD MY SALARY
 // =========================================================
 
 async function loadMySalary(token) {
@@ -333,14 +272,10 @@ async function loadMySalary(token) {
             await fetch(
                 "/salary/me",
                 {
-
                     headers: {
-
                         "Authorization":
                             "Bearer " + token
-
                     }
-
                 }
             );
 
@@ -350,7 +285,6 @@ async function loadMySalary(token) {
             logoutFromPayroll();
 
             return;
-
         }
 
 
@@ -360,12 +294,17 @@ async function loadMySalary(token) {
 
         if (!response.ok) {
 
-            message.textContent =
-                data.detail ||
-                "Unable to load salary.";
+            if (message) {
+
+                message.textContent =
+                    data.detail ||
+                    "Unable to load salary.";
+
+                message.className =
+                    "message error-message";
+            }
 
             return;
-
         }
 
 
@@ -376,13 +315,13 @@ async function loadMySalary(token) {
         document.getElementById(
             "mySalaryEmployee"
         ).textContent =
-            data.employee_name;
+            `${data.employee_id} - ${data.employee_name}`;
 
 
         document.getElementById(
             "myBasicSalary"
         ).textContent =
-            formatCurrency(
+            formatPayrollCurrency(
                 data.basic_salary,
                 currency
             );
@@ -391,7 +330,7 @@ async function loadMySalary(token) {
         document.getElementById(
             "myAllowances"
         ).textContent =
-            formatCurrency(
+            formatPayrollCurrency(
                 data.allowances,
                 currency
             );
@@ -400,7 +339,7 @@ async function loadMySalary(token) {
         document.getElementById(
             "myDeductions"
         ).textContent =
-            formatCurrency(
+            formatPayrollCurrency(
                 data.deductions,
                 currency
             );
@@ -409,7 +348,7 @@ async function loadMySalary(token) {
         document.getElementById(
             "myNetSalary"
         ).textContent =
-            formatCurrency(
+            formatPayrollCurrency(
                 data.net_salary,
                 currency
             );
@@ -418,7 +357,7 @@ async function loadMySalary(token) {
         document.getElementById(
             "breakdownBasic"
         ).textContent =
-            formatCurrency(
+            formatPayrollCurrency(
                 data.basic_salary,
                 currency
             );
@@ -427,7 +366,7 @@ async function loadMySalary(token) {
         document.getElementById(
             "breakdownAllowances"
         ).textContent =
-            formatCurrency(
+            formatPayrollCurrency(
                 data.allowances,
                 currency
             );
@@ -436,7 +375,7 @@ async function loadMySalary(token) {
         document.getElementById(
             "breakdownDeductions"
         ).textContent =
-            formatCurrency(
+            formatPayrollCurrency(
                 data.deductions,
                 currency
             );
@@ -445,13 +384,17 @@ async function loadMySalary(token) {
         document.getElementById(
             "breakdownNet"
         ).textContent =
-            formatCurrency(
+            formatPayrollCurrency(
                 data.net_salary,
                 currency
             );
 
 
-        message.textContent = "";
+        if (message) {
+
+            message.textContent = "";
+            message.className = "message";
+        }
 
 
     } catch (error) {
@@ -461,17 +404,20 @@ async function loadMySalary(token) {
             error
         );
 
+        if (message) {
 
-        message.textContent =
-            "Unable to connect to server.";
+            message.textContent =
+                "Unable to connect to server.";
 
+            message.className =
+                "message error-message";
+        }
     }
-
 }
 
 
 // =========================================================
-// ADMIN / HR SALARY LIST
+// LOAD ALL SALARIES
 // =========================================================
 
 async function loadAllSalaries(token) {
@@ -483,15 +429,13 @@ async function loadAllSalaries(token) {
 
 
     if (!tableBody) {
-
         return;
-
     }
 
 
     tableBody.innerHTML = `
         <tr>
-            <td colspan="9" class="empty-table">
+            <td colspan="8" class="empty-table">
                 Loading salary records...
             </td>
         </tr>
@@ -504,14 +448,10 @@ async function loadAllSalaries(token) {
             await fetch(
                 "/salary/",
                 {
-
                     headers: {
-
                         "Authorization":
                             "Bearer " + token
-
                     }
-
                 }
             );
 
@@ -521,22 +461,6 @@ async function loadAllSalaries(token) {
             logoutFromPayroll();
 
             return;
-
-        }
-
-
-        if (response.status === 403) {
-
-            tableBody.innerHTML = `
-                <tr>
-                    <td colspan="9" class="empty-table">
-                        Access denied.
-                    </td>
-                </tr>
-            `;
-
-            return;
-
         }
 
 
@@ -548,7 +472,7 @@ async function loadAllSalaries(token) {
 
             tableBody.innerHTML = `
                 <tr>
-                    <td colspan="9" class="empty-table">
+                    <td colspan="8" class="empty-table">
                         ${
                             records.detail ||
                             "Unable to load salaries."
@@ -558,104 +482,93 @@ async function loadAllSalaries(token) {
             `;
 
             return;
-
         }
 
 
         tableBody.innerHTML = "";
 
 
-        if (records.length === 0) {
+        if (!records.length) {
 
             tableBody.innerHTML = `
                 <tr>
-                    <td colspan="9" class="empty-table">
+                    <td colspan="8" class="empty-table">
                         No salary records found.
                     </td>
                 </tr>
             `;
 
             return;
-
         }
 
 
-        records.forEach(
-            function (record) {
+        records.forEach(record => {
 
-                const row =
-                    document.createElement(
-                        "tr"
-                    );
+            const row =
+                document.createElement("tr");
 
 
-                row.innerHTML = `
+            row.innerHTML = `
 
-                    <td>
-                        ${record.salary_id}
-                    </td>
+                <td>
+                    ${escapePayrollHtml(
+                        record.salary_id
+                    )}
+                </td>
 
-                    <td>
-                        ${record.employee_id}
-                    </td>
+                <td>
+                    ${escapePayrollHtml(
+                        record.employee_code
+                    )}
+                </td>
 
-                    <td>
-                        ${escapePayrollHtml(
-                            record.employee_code
-                        )}
-                    </td>
+                <td>
+                    ${escapePayrollHtml(
+                        record.employee_name
+                    )}
+                </td>
 
-                    <td>
-                        ${escapePayrollHtml(
-                            record.employee_name
-                        )}
-                    </td>
+                <td>
+                    ${formatPayrollCurrency(
+                        record.basic_salary,
+                        record.currency
+                    )}
+                </td>
 
-                    <td>
-                        ${formatCurrency(
-                            record.basic_salary,
+                <td>
+                    ${formatPayrollCurrency(
+                        record.allowances,
+                        record.currency
+                    )}
+                </td>
+
+                <td>
+                    ${formatPayrollCurrency(
+                        record.deductions,
+                        record.currency
+                    )}
+                </td>
+
+                <td>
+                    <strong>
+                        ${formatPayrollCurrency(
+                            record.net_salary,
                             record.currency
                         )}
-                    </td>
+                    </strong>
+                </td>
 
-                    <td>
-                        ${formatCurrency(
-                            record.allowances,
-                            record.currency
-                        )}
-                    </td>
+                <td>
+                    ${escapePayrollHtml(
+                        record.currency
+                    )}
+                </td>
 
-                    <td>
-                        ${formatCurrency(
-                            record.deductions,
-                            record.currency
-                        )}
-                    </td>
-
-                    <td>
-                        <strong>
-                            ${formatCurrency(
-                                record.net_salary,
-                                record.currency
-                            )}
-                        </strong>
-                    </td>
-
-                    <td>
-                        ${escapePayrollHtml(
-                            record.currency
-                        )}
-                    </td>
-
-                `;
+            `;
 
 
-                tableBody.appendChild(
-                    row
-                );
-
-            }
-        );
+            tableBody.appendChild(row);
+        });
 
 
     } catch (error) {
@@ -668,14 +581,12 @@ async function loadAllSalaries(token) {
 
         tableBody.innerHTML = `
             <tr>
-                <td colspan="9" class="empty-table">
+                <td colspan="8" class="empty-table">
                     Unable to connect to server.
                 </td>
             </tr>
         `;
-
     }
-
 }
 
 
@@ -706,12 +617,12 @@ async function createSalary(event) {
         );
 
 
-    const employeeId =
-        Number(
-            document.getElementById(
-                "salaryEmployeeId"
-            ).value
-        );
+    const employeeCode =
+        document.getElementById(
+            "salaryEmployeeId"
+        ).value
+            .trim()
+            .toUpperCase();
 
 
     const basicSalary =
@@ -744,54 +655,66 @@ async function createSalary(event) {
         ).value;
 
 
+    if (!employeeCode) {
+
+        showPayrollMessage(
+            "Enter Employee Code, for example EMP001.",
+            "error"
+        );
+
+        return;
+    }
+
+
     if (
-        !employeeId ||
-        employeeId < 1
+        !Number.isFinite(basicSalary) ||
+        basicSalary < 0
     ) {
 
-        message.textContent =
-            "Enter a valid employee database ID.";
+        showPayrollMessage(
+            "Enter a valid basic salary.",
+            "error"
+        );
 
         return;
-
     }
 
 
-    if (basicSalary < 0) {
+    if (
+        !Number.isFinite(allowances) ||
+        allowances < 0
+    ) {
 
-        message.textContent =
-            "Basic salary cannot be negative.";
+        showPayrollMessage(
+            "Allowances cannot be negative.",
+            "error"
+        );
 
         return;
-
     }
 
 
-    if (allowances < 0) {
+    if (
+        !Number.isFinite(deductions) ||
+        deductions < 0
+    ) {
 
-        message.textContent =
-            "Allowances cannot be negative.";
-
-        return;
-
-    }
-
-
-    if (deductions < 0) {
-
-        message.textContent =
-            "Deductions cannot be negative.";
+        showPayrollMessage(
+            "Deductions cannot be negative.",
+            "error"
+        );
 
         return;
-
     }
 
 
     button.disabled = true;
 
 
-    message.textContent =
-        "Creating salary record...";
+    showPayrollMessage(
+        "Creating salary record...",
+        ""
+    );
 
 
     try {
@@ -800,24 +723,20 @@ async function createSalary(event) {
             await fetch(
                 "/salary/",
                 {
-
                     method: "POST",
 
                     headers: {
-
                         "Content-Type":
                             "application/json",
 
                         "Authorization":
                             "Bearer " + token
-
                     },
 
                     body:
                         JSON.stringify({
-
                             employee_id:
-                                employeeId,
+                                employeeCode,
 
                             basic_salary:
                                 basicSalary,
@@ -830,9 +749,7 @@ async function createSalary(event) {
 
                             currency:
                                 currency
-
                         })
-
                 }
             );
 
@@ -846,23 +763,29 @@ async function createSalary(event) {
             logoutFromPayroll();
 
             return;
-
         }
 
 
         if (!response.ok) {
 
-            message.textContent =
+            showPayrollMessage(
                 data.detail ||
-                "Unable to create salary record.";
+                "Unable to create salary record.",
+                "error"
+            );
 
             return;
-
         }
 
 
-        message.textContent =
-            "Salary record created successfully.";
+        showPayrollMessage(
+            `Salary saved for ${
+                data.salary.employee_code
+            } - ${
+                data.salary.employee_name
+            }.`,
+            "success"
+        );
 
 
         document.getElementById(
@@ -885,7 +808,7 @@ async function createSalary(event) {
         ).value = "INR";
 
 
-        loadAllSalaries(token);
+        await loadAllSalaries(token);
 
 
     } catch (error) {
@@ -896,23 +819,67 @@ async function createSalary(event) {
         );
 
 
-        message.textContent =
-            "Unable to connect to server.";
+        showPayrollMessage(
+            "Unable to connect to server.",
+            "error"
+        );
+
 
     } finally {
 
         button.disabled = false;
-
     }
-
 }
 
 
 // =========================================================
-// FORMAT CURRENCY
+// MESSAGE
 // =========================================================
 
-function formatCurrency(
+function showPayrollMessage(
+    text,
+    type
+) {
+
+    const message =
+        document.getElementById(
+            "salaryFormMessage"
+        );
+
+
+    if (!message) {
+        return;
+    }
+
+
+    message.textContent = text;
+
+
+    if (type === "success") {
+
+        message.className =
+            "message success-message";
+    }
+
+    else if (type === "error") {
+
+        message.className =
+            "message error-message";
+    }
+
+    else {
+
+        message.className =
+            "message";
+    }
+}
+
+
+// =========================================================
+// CURRENCY
+// =========================================================
+
+function formatPayrollCurrency(
     amount,
     currency
 ) {
@@ -933,7 +900,6 @@ function formatCurrency(
                 }
             )
         );
-
     }
 
 
@@ -948,15 +914,22 @@ function formatCurrency(
             }
         )
     );
-
 }
 
 
 // =========================================================
-// HTML ESCAPING
+// HTML ESCAPE
 // =========================================================
 
 function escapePayrollHtml(value) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+        return "";
+    }
+
 
     return String(value)
         .replace(
@@ -979,7 +952,6 @@ function escapePayrollHtml(value) {
             /'/g,
             "&#039;"
         );
-
 }
 
 
@@ -1002,5 +974,4 @@ function logoutFromPayroll() {
     );
 
     window.location.href = "/";
-
 }

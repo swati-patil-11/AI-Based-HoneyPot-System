@@ -132,7 +132,7 @@ function configureSidebar() {
             <a href="/employees-page">Employees</a>
             <a href="/attendance-page">Attendance</a>
             <a href="/payroll-page">Payroll</a>
-            <a href="/profile-page">My Profile</a>
+            
         `;
 
     } else if (role === "employee") {
