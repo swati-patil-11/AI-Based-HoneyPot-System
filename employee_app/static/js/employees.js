@@ -262,32 +262,41 @@ if (departmentIdInput) {
 
         try {
 
-            const response =
-                await apiFetch("/employees/");
+            let employees = [];
+            let page = 1;
+            const size = 100;
 
-            if (response.status === 401) {
-                logout();
-                return;
+            while (true) {
+
+                const response =
+                    await apiFetch(`/employees/?page=${page}&size=${size}`);
+
+                if (response.status === 401) {
+                    logout();
+                    return;
+                }
+
+                if (!response.ok) {
+
+                    const data =
+                        await response.json().catch(() => ({}));
+
+                    throw new Error(
+                        data.detail ||
+                        "Unable to load employees."
+                    );
+                }
+
+                const batch = await response.json();
+
+                employees = employees.concat(batch);
+
+                if (batch.length < size) {
+                    break;
+                }
+
+                page += 1;
             }
-
-            if (!response.ok) {
-
-                const data =
-                    await response.json().catch(() => ({}));
-
-                throw new Error(
-                    data.detail ||
-                    "Unable to load employees."
-                );
-            }
-
-            const data =
-                await response.json();
-
-            const employees =
-                Array.isArray(data)
-                    ? data
-                    : (data.employees || []);
 
             renderEmployees(employees);
 

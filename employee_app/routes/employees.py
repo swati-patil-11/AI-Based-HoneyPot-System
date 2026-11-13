@@ -1,8 +1,9 @@
 import re
 from datetime import date
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from pydantic import BaseModel
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from database import get_db
@@ -276,10 +277,23 @@ def create_employee(
 
 @router.get("/")
 def get_employees(
+    response: Response,
+    page: int = Query(1, ge=1),
+    size: int = Query(20, ge=1, le=100),
     db: Session = Depends(get_db),
     current_user=Depends(require_roles("admin", "hr"))
 ):
-    employees = db.query(Employee).all()
+    total = db.query(Employee).count()
+
+    employees = (
+        db.query(Employee)
+        .order_by(Employee.id)
+        .offset((page - 1) * size)
+        .limit(size)
+        .all()
+    )
+
+    response.headers["X-Total-Count"] = str(total)
 
     return employees
 
@@ -481,6 +495,42 @@ def update_my_employee_profile(
 # GET EMPLOYEE BY ID
 # ADMIN + HR
 # ============================================================
+
+@router.get("/search")
+def search_employees(
+    response: Response,
+    q: str = Query(..., min_length=1, max_length=50),
+    page: int = Query(1, ge=1),
+    size: int = Query(20, ge=1, le=100),
+    db: Session = Depends(get_db),
+    current_user=Depends(require_roles("admin", "hr"))
+):
+    # escape LIKE wildcards so "%" and "_" are searched literally
+    safe = q.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+    pattern = f"%{safe}%"
+
+    query = db.query(Employee).filter(
+        or_(
+            Employee.first_name.ilike(pattern, escape="\\"),
+            Employee.last_name.ilike(pattern, escape="\\"),
+            Employee.email.ilike(pattern, escape="\\"),
+            Employee.employee_id.ilike(pattern, escape="\\"),
+        )
+    )
+
+    total = query.count()
+
+    results = (
+        query.order_by(Employee.id)
+        .offset((page - 1) * size)
+        .limit(size)
+        .all()
+    )
+
+    response.headers["X-Total-Count"] = str(total)
+
+    return results
+
 
 @router.get("/{employee_id}")
 def get_employee(

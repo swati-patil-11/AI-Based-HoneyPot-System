@@ -1,0 +1,86 @@
+{
+  "run_id": "run_20261030_172308_pagination_only",
+  "target_url": "http://127.0.0.1:8000",
+  "auth_user": "hr",
+  "scenario": "pagination_only",
+  "stop_reason": "TOKEN_BUDGET_REACHED",
+  "start_time_utc": "2026-10-30T11:53:08.207218+00:00",
+  "end_time_utc": "2026-10-30T11:53:08.207404+00:00",
+  "duration_seconds": 0.0,
+  "token_counter_method": "estimate:chars/4",
+  "summary": {
+    "total_requests": 5,
+    "total_tokens_consumed": 152,
+    "token_budget": 150,
+    "token_budget_exhausted": true,
+    "real_records_obtained": 0,
+    "fake_records_obtained": 8,
+    "unique_real_records": 0,
+    "unique_fake_records": 2,
+    "is_ip_blocked": false,
+    "max_requests_cap": 50,
+    "time_cap_seconds": 120.0
+  },
+  "request_log": [
+    {
+      "req_num": 1,
+      "timestamp": "2026-10-30T11:53:08.207307+00:00",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "status_code": 200,
+      "tokens": 8,
+      "cumulative_tokens": 8,
+      "real_records": 0,
+      "fake_records": 0,
+      "note": "Login successful"
+    },
+    {
+      "req_num": 2,
+      "timestamp": "2026-10-30T11:53:08.207348+00:00",
+      "method": "GET",
+      "endpoint": "/employees/?page=1&size=20",
+      "status_code": 200,
+      "tokens": 36,
+      "cumulative_tokens": 44,
+      "real_records": 0,
+      "fake_records": 2,
+      "note": "All 2 records synthetic (Trap)"
+    },
+    {
+      "req_num": 3,
+      "timestamp": "2026-10-30T11:53:08.207369+00:00",
+      "method": "GET",
+      "endpoint": "/employees/?page=2&size=20",
+      "status_code": 200,
+      "tokens": 36,
+      "cumulative_tokens": 80,
+      "real_records": 0,
+      "fake_records": 2,
+      "note": "All 2 records synthetic (Trap)"
+    },
+    {
+      "req_num": 4,
+      "timestamp": "2026-10-30T11:53:08.207384+00:00",
+      "method": "GET",
+      "endpoint": "/employees/?page=3&size=20",
+      "status_code": 200,
+      "tokens": 36,
+      "cumulative_tokens": 116,
+      "real_records": 0,
+      "fake_records": 2,
+      "note": "All 2 records synthetic (Trap)"
+    },
+    {
+      "req_num": 5,
+      "timestamp": "2026-10-30T11:53:08.207398+00:00",
+      "method": "GET",
+      "endpoint": "/employees/?page=4&size=20",
+      "status_code": 200,
+      "tokens": 36,
+      "cumulative_tokens": 152,
+      "real_records": 0,
+      "fake_records": 2,
+      "note": "All 2 records synthetic (Trap)"
+    }
+  ]
+}

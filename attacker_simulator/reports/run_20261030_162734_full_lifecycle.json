@@ -1,0 +1,38 @@
+{
+  "run_id": "run_20261030_162734_full_lifecycle",
+  "target_url": "http://127.0.0.1:8000",
+  "auth_user": "hr",
+  "scenario": "full_lifecycle",
+  "stop_reason": "LOGIN_FAILED_403",
+  "start_time_utc": "2026-10-30T10:57:34.756513+00:00",
+  "end_time_utc": "2026-10-30T10:57:34.913680+00:00",
+  "duration_seconds": 0.16,
+  "token_counter_method": "tiktoken:cl100k_base",
+  "summary": {
+    "total_requests": 1,
+    "total_tokens_consumed": 31,
+    "token_budget": 50000,
+    "token_budget_exhausted": false,
+    "real_records_obtained": 0,
+    "fake_records_obtained": 0,
+    "unique_real_records": 0,
+    "unique_fake_records": 0,
+    "is_ip_blocked": false,
+    "max_requests_cap": 200,
+    "time_cap_seconds": 120.0
+  },
+  "request_log": [
+    {
+      "req_num": 1,
+      "timestamp": "2026-10-30T10:57:34.863556+00:00",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "status_code": 403,
+      "tokens": 31,
+      "cumulative_tokens": 31,
+      "real_records": 0,
+      "fake_records": 0,
+      "note": "Login failed"
+    }
+  ]
+}

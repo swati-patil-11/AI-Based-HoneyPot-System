@@ -1,18 +1,22 @@
+import asyncio
+from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, WebSocket
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.requests import Request
 
 from database import Base, engine
+from security_database import SecurityBase, security_engine
 
 from models.user import User
 from models.employee import Employee
 from models.department import Department
 from models.attendance import Attendance
 from models.salary import Salary
+from models import security as security_models  # noqa: F401 (registers security tables)
 
 from routes.departments import router as department_router
 from routes.employees import router as employee_router
@@ -23,6 +27,13 @@ from routes.attendance import router as attendance_router
 from routes.salary import router as salary_router
 from routes.dashboard import router as dashboard_router
 from routes.users import router as users_router
+from routes.admin_security import router as admin_security_router, handle_admin_ws
+from routes.trap import router as trap_router
+from services import blocking_service, system_metrics_service, trap_service
+
+from middleware.detection import DetectionMiddleware
+from middleware.ip_blocker import IPBlockerMiddleware
+from middleware.request_logger import RequestLoggerMiddleware
 
 # ---------------------------------------------------------
 # Project directories
@@ -39,16 +50,33 @@ STATIC_DIR = BASE_DIR / "static"
 # ---------------------------------------------------------
 
 Base.metadata.create_all(bind=engine)
+SecurityBase.metadata.create_all(bind=security_engine)
+trap_service.expire_all_open_sessions()   # sessions left open by a stopped server
 
 
 # ---------------------------------------------------------
 # FastAPI application
 # ---------------------------------------------------------
 
+@asynccontextmanager
+async def lifespan(_app):
+    # background job: marks finished IP blocks as EXPIRED
+    cleanup_task = asyncio.create_task(blocking_service.cleanup_loop())
+    # background job: samples CPU/memory and system health (Phase 11)
+    metrics_task = asyncio.create_task(system_metrics_service.metrics_loop())
+
+    try:
+        yield
+    finally:
+        cleanup_task.cancel()
+        metrics_task.cancel()
+
+
 app = FastAPI(
     title="Employee Management System",
     description="Employee Management Application",
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan
 )
 
 
@@ -85,6 +113,29 @@ app.include_router(attendance_router)
 app.include_router(salary_router)
 app.include_router(dashboard_router)
 app.include_router(users_router)
+app.include_router(admin_security_router)
+app.include_router(trap_router)
+
+
+# ---------------------------------------------------------
+# Security middleware
+# ---------------------------------------------------------
+# Starlette: the LAST middleware added is the OUTERMOST one.
+# We want:  request_logger (outer) -> ip_blocker -> detection -> routes
+# so the logger also records requests that the blocker rejects.
+
+app.add_middleware(DetectionMiddleware)
+app.add_middleware(IPBlockerMiddleware)
+app.add_middleware(RequestLoggerMiddleware)
+
+# ---------------------------------------------------------
+# WebSockets (Phase 11)
+# ---------------------------------------------------------
+
+@app.websocket("/ws/admin")
+async def ws_admin_endpoint(websocket: WebSocket, token: str | None = None):
+    await handle_admin_ws(websocket, token)
+
 
 # ---------------------------------------------------------
 # Frontend pages
@@ -190,5 +241,19 @@ def users_page(request: Request):
     return templates.TemplateResponse(
         request=request,
         name="users.html",
+        context={"request": request}
+    )
+
+
+# ---------------------------------------------------------
+# Security Dashboard (Phase 12)
+# ---------------------------------------------------------
+
+@app.get("/admin/security-dashboard", response_class=HTMLResponse)
+@app.get("/security-dashboard", response_class=HTMLResponse)
+def security_dashboard_page(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="admin/security_dashboard.html",
         context={"request": request}
     )

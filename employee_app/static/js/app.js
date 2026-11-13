@@ -124,6 +124,7 @@ function configureSidebar() {
             <a href="/attendance-page">Attendance</a>
             <a href="/payroll-page">Payroll</a>
             <a href="/users-page">User Management</a>
+            <a href="/admin/security-dashboard">🛡️ Security Dashboard</a>
         `;
 
     } else if (role === "hr") {
