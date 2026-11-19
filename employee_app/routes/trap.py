@@ -44,7 +44,7 @@ def _open_session(ip: str):
         db.close()
 
 
-async def _stream(session_id: int, already_served: int):
+async def _stream(session_id: int, already_served: int, ip: str = "127.0.0.1"):
     """
     One record at a time. Stops at the FIRST limit reached:
     records per session, session time, response size, or (slowed down)
@@ -61,6 +61,7 @@ async def _stream(session_id: int, already_served: int):
     stop_status = None
     started = time.monotonic()
     interval_started = time.perf_counter()
+    streamed_records = []
 
     try:
         session = db.get(TrapSession, session_id)
@@ -79,7 +80,9 @@ async def _stream(session_id: int, already_served: int):
                 stop_status = "EXPIRED"
                 break
 
-            line = json.dumps(synthetic.make_record(next_id)) + "\n"
+            rec = synthetic.make_record(next_id)
+            streamed_records.append(rec)
+            line = json.dumps(rec) + "\n"
             size = len(line.encode())
 
             if sent_bytes + size > cfg.MAX_RESPONSE_SIZE:
@@ -115,6 +118,12 @@ async def _stream(session_id: int, already_served: int):
             response_ms=round((time.perf_counter() - interval_started) * 1000, 2),
         )
 
+        # Requirement 4: Save streamed fake records to new log files
+        if streamed_records:
+            trap_service.log_fake_trap_data(
+                session_id, ip, "/api/trap/records", streamed_records, sent_tokens
+            )
+
         if not stop_status and (sent > 0 or already_served > 0):
             stop_status = "COMPLETED"
 
@@ -137,18 +146,19 @@ async def export_records(
 
     request.state.is_trap = True
 
+    client_ip = get_client_ip(request)
     session_id, already_served, refusal = await run_in_threadpool(
-        _open_session, get_client_ip(request)
+        _open_session, client_ip
     )
 
     if refusal is not None:
         await run_in_threadpool(
-            blocking_service.register_trap_refusal, get_client_ip(request)
+            blocking_service.register_trap_refusal, client_ip
         )
         reply = trap_service.refusal_reply(refusal)
         return JSONResponse(reply.body, status_code=reply.status, headers=reply.headers)
 
     return StreamingResponse(
-        _stream(session_id, already_served),
+        _stream(session_id, already_served, client_ip),
         media_type="application/x-ndjson",
     )

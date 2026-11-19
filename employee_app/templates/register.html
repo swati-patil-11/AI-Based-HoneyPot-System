@@ -2,119 +2,404 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Portal — Register</title>
+    <link rel="stylesheet" href="/static/css/style.css?v=2.2">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            color: #1e293b;
+        }
 
-    <title>Employee Management System - Register</title>
+        .auth-card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 460px;
+            padding: 36px 32px;
+            border-radius: 18px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.1);
+        }
 
-    <link
-        rel="stylesheet"
-        href="/static/css/style.css"
-    >
+        .auth-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
 
+        .auth-logo-icon {
+            width: 56px;
+            height: 56px;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin: 0 auto 12px;
+        }
+
+        .auth-header h1 {
+            font-size: 22px;
+            font-weight: 800;
+            color: #0f172a;
+            letter-spacing: -0.3px;
+            margin-bottom: 4px;
+        }
+
+        .auth-header p {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        /* Segmented Tabs */
+        .auth-tabs {
+            display: flex;
+            background: #f1f5f9;
+            padding: 4px;
+            border-radius: 12px;
+            margin-bottom: 22px;
+        }
+
+        .auth-tab {
+            flex: 1;
+            text-align: center;
+            padding: 9px 12px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #64748b;
+            text-decoration: none;
+            border-radius: 9px;
+            transition: all 0.2s ease;
+            display: inline-block;
+        }
+
+        .auth-tab.active {
+            background: #ffffff;
+            color: #0f172a;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 7px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        /* Role Selector */
+        .role-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .role-option {
+            flex: 1;
+            position: relative;
+        }
+
+        .role-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .role-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 6px;
+            background: #f8fafc;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 12px;
+            font-weight: 600;
+            color: #475569;
+            text-align: center;
+            gap: 4px;
+        }
+
+        .role-icon {
+            font-size: 18px;
+        }
+
+        .role-option input[type="radio"]:checked + .role-label {
+            background: #eff6ff;
+            border-color: #2563eb;
+            color: #1d4ed8;
+            box-shadow: 0 2px 6px rgba(37, 99, 235, 0.15);
+        }
+
+        /* Input field with embedded icon */
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 14px;
+            font-size: 16px;
+            pointer-events: none;
+            color: #94a3b8;
+            user-select: none;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            height: 44px;
+            padding: 0 44px 0 42px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 14px;
+            color: #0f172a;
+            background: #ffffff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .input-wrapper input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+
+        .btn-toggle-pwd {
+            position: absolute;
+            right: 8px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: #64748b;
+            padding: 6px 8px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.2s;
+        }
+
+        .btn-toggle-pwd:hover {
+            opacity: 0.7;
+        }
+
+        .btn-primary-auth {
+            width: 100%;
+            height: 44px;
+            background: #2563eb;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 700;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+        }
+
+        .btn-primary-auth:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+        }
+
+        .btn-primary-auth:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .auth-footer-link {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .auth-footer-link a {
+            color: #2563eb;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .auth-footer-link a:hover {
+            text-decoration: underline;
+        }
+
+        /* Alert Banners */
+        .message-box {
+            display: none;
+            padding: 12px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            animation: fadeIn 0.25s ease-out;
+        }
+
+        .alert-success {
+            background: #ecfdf5;
+            border: 1px solid #6ee7b7;
+            color: #065f46;
+        }
+
+        .alert-error {
+            background: #fef2f2;
+            border: 1px solid #fca5a5;
+            color: #991b1b;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
 
 <body>
 
-    <div class="auth-container">
+    <div class="auth-card">
 
-        <div class="auth-card">
+        <div class="auth-header">
+            <div class="auth-logo-icon">📝</div>
+            <h1>Create Account</h1>
+            <p>Self-Register as Employee, HR, or Admin</p>
+        </div>
 
-            <h1>Create Employee Account</h1>
+        <!-- Segmented Tab Switcher -->
+        <div class="auth-tabs">
+            <a href="/login" class="auth-tab">Sign In</a>
+            <a href="/register" class="auth-tab active">Create Account</a>
+        </div>
 
-            <p class="subtitle">
-                Register for the employee portal
-            </p>
+        <!-- Feedback Alert Container -->
+        <div id="registerMessage" class="message-box"></div>
 
+        <form id="registerForm">
+            <!-- Account Role Selection -->
+            <div class="form-group">
+                <label>Select Your Account Role</label>
+                <div class="role-selector">
+                    <div class="role-option">
+                        <input type="radio" name="accountRole" id="roleEmployee" value="employee" checked>
+                        <label for="roleEmployee" class="role-label">
+                            <span class="role-icon">👤</span>
+                            <span>Employee</span>
+                        </label>
+                    </div>
 
-            <form id="registerForm">
+                    <div class="role-option">
+                        <input type="radio" name="accountRole" id="roleHr" value="hr">
+                        <label for="roleHr" class="role-label">
+                            <span class="role-icon">💼</span>
+                            <span>HR Portal</span>
+                        </label>
+                    </div>
 
-                <div class="form-group">
+                    <div class="role-option">
+                        <input type="radio" name="accountRole" id="roleAdmin" value="admin">
+                        <label for="roleAdmin" class="role-label">
+                            <span class="role-icon">👑</span>
+                            <span>Admin</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
 
-                    <label for="registerUsername">
-                        Username
-                    </label>
-
+            <div class="form-group">
+                <label for="registerUsername">Username</label>
+                <div class="input-wrapper">
+                    <span class="input-icon">👤</span>
                     <input
                         type="text"
                         id="registerUsername"
-                        placeholder="Enter username"
+                        placeholder="Choose a username"
                         required
+                        autocomplete="username"
                     >
-
                 </div>
+            </div>
 
-
-                <div class="form-group">
-
-                    <label for="registerEmail">
-                        Email
-                    </label>
-
+            <div class="form-group">
+                <label for="registerEmail">Work Email</label>
+                <div class="input-wrapper">
+                    <span class="input-icon">✉️</span>
                     <input
                         type="email"
                         id="registerEmail"
-                        placeholder="Enter email"
+                        placeholder="name@example.com"
                         required
+                        autocomplete="email"
                     >
-
                 </div>
+            </div>
 
-
-                <div class="form-group">
-
-                    <label for="registerPassword">
-                        Password
-                    </label>
-
+            <div class="form-group">
+                <label for="registerPassword">Password</label>
+                <div class="input-wrapper">
+                    <span class="input-icon">🔒</span>
                     <input
                         type="password"
                         id="registerPassword"
-                        placeholder="Enter password"
+                        placeholder="Choose a password"
                         required
+                        autocomplete="new-password"
                     >
-
+                    <button
+                        type="button"
+                        class="btn-toggle-pwd"
+                        onclick="togglePasswordVisibility('registerPassword', 'regPwdToggleIcon')"
+                        title="Show/Hide password"
+                    >
+                        <span id="regPwdToggleIcon">👁️</span>
+                    </button>
                 </div>
+            </div>
 
+            <button
+                type="submit"
+                id="registerSubmitBtn"
+                class="btn-primary-auth"
+            >
+                Create Account
+            </button>
+        </form>
 
-                <button
-                    type="submit"
-                    class="btn-primary"
-                >
-                    Register
-                </button>
-
-            </form>
-
-
-            <div
-                id="registerMessage"
-                class="message"
-            ></div>
-
-
-            <p class="auth-link">
-
-                Already have an account?
-
-                <a href="/">
-                    Login
-                </a>
-
-            </p>
-
-        </div>
+        <p class="auth-footer-link">
+            Already have an account?
+            <a href="/login">Sign In &rarr;</a>
+        </p>
 
     </div>
 
-
     <script src="/static/js/app.js"></script>
-
 </body>
 
 </html>

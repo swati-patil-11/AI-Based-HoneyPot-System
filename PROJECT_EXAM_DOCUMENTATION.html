@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Based Honeypot & Deception Defense System — Technical Exam Documentation</title>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --secondary: #0284c7;
+            --accent: #ef4444;
+            --text: #1e293b;
+            --bg-light: #f8fafc;
+            --border: #cbd5e1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background: #f1f5f9;
+            color: var(--text);
+            line-height: 1.6;
+            padding: 30px 20px;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 48px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .no-print-bar {
+            background: #0f172a;
+            color: #ffffff;
+            padding: 14px 24px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-print {
+            background: #3b82f6;
+            color: #ffffff;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-print:hover {
+            background: #2563eb;
+        }
+
+        h1 {
+            color: #0f172a;
+            font-size: 28px;
+            font-weight: 800;
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 12px;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: var(--primary);
+            font-size: 20px;
+            font-weight: 700;
+            margin-top: 36px;
+            margin-bottom: 14px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 6px;
+        }
+
+        h3 {
+            color: #334155;
+            font-size: 16px;
+            font-weight: 700;
+            margin-top: 20px;
+            margin-bottom: 8px;
+        }
+
+        p, li {
+            font-size: 14px;
+            color: #334155;
+            margin-bottom: 10px;
+        }
+
+        ul, ol {
+            padding-left: 24px;
+            margin-bottom: 16px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 18px 0;
+            font-size: 13px;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 10px 12px;
+            text-align: left;
+        }
+
+        th {
+            background: #f1f5f9;
+            color: #0f172a;
+            font-weight: 700;
+        }
+
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            color: #0f172a;
+        }
+
+        pre {
+            background: #0f172a;
+            color: #f8fafc;
+            padding: 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            margin: 16px 0;
+        }
+
+        .card-box {
+            background: #f8fafc;
+            border-left: 4px solid var(--secondary);
+            padding: 16px;
+            border-radius: 0 8px 8px 0;
+            margin: 16px 0;
+            font-size: 13px;
+        }
+
+        .formula-box {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            padding: 16px;
+            border-radius: 8px;
+            margin: 16px 0;
+            text-align: center;
+            font-family: monospace;
+            font-size: 15px;
+            font-weight: bold;
+            color: #1e3a8a;
+        }
+
+        @media print {
+            body {
+                background: #ffffff;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                padding: 0;
+                max-width: 100%;
+            }
+            .no-print-bar {
+                display: none;
+            }
+            h2 {
+                page-break-before: auto;
+            }
+            table, pre {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <div class="no-print-bar">
+            <span>📄 <strong>Project Technical Report & Exam Reference</strong></span>
+            <button class="btn-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+        </div>
+
+        <h1>AI-Based Dynamic Honeypot, Telemetry & Deception Defense System</h1>
+        <div class="subtitle">
+            Comprehensive Project Specification, Architectural Breakdown & Examination Reference Manual
+        </div>
+
+        <h2>1. Executive Summary & Core Innovation</h2>
+        <p>
+            Traditional Web Application Firewalls (WAFs) rely on static signature matching and blunt connection termination (TCP resets / IP drops). While effective against simple script-kiddie tools, they suffer two fatal weaknesses:
+        </p>
+        <ol>
+            <li><strong>Reconnaissance Alerting</strong>: Dropping a connection informs an intelligent adversary or LLM web scraper that their probe hit a defensive boundary, allowing them to mutate payloads or rotate IPs.</li>
+            <li><strong>Resource Asymmetry</strong>: The defender spends CPU and bandwidth inspecting traffic while the attacker harvests corporate databases freely.</li>
+        </ol>
+        <p>
+            This project implements an <strong>Active Deception Architecture</strong>. Instead of blocking adversaries outright, the application monitors behavioral telemetry in real-time. When suspicion exceeds the threshold (Score &ge; 80/100), the system dynamically traps the attacker inside a synthetic honeypot data stream without alerting them. The adversary wastes compute, time, and LLM context window tokens harvesting poison records, while 100% of real sensitive corporate data remains fully protected.
+        </p>
+
+        <h2>2. High-Level Architecture & Workflow</h2>
+        <pre>
+[Incoming Client Request] 
+         │
+         ▼
+[IPBlockerMiddleware] ──(Active Block in security.db?)──► YES ──► [HTTP 403 Forbidden Screen (blocked.html)]
+         │ (NO)
+         ▼
+[RequestLoggerMiddleware] ──► Logs to security.db (WAL Mode) & Feeds 60-Second Sliding Window
+         │
+         ▼
+[8-Signal Behavioral Heuristic Engine] ──► Computes Suspicion Score (0 to 100)
+         │
+         ├──────────────────────────────────────────┐
+         ▼ (Score &lt; 80: Normal Traffic)             ▼ (Score &ge; 80: Suspicious Attacker)
+[Real ERP Business Database: employee.db]    [Honeypot Trap Router: trap_service.py]
+  - Real Employees                             - Deterministic Faker Generator (TRAP_SEED per ID)
+  - Confidential Salaries                      - Poisoned Domains (@corp-example.com)
+  - Organization Roster                        - LLM Token Meter (tiktoken cl100k_base)
+                                               - Decoy File Logger (employee_app/fake_logs/)
+                                               - Context Window Buffer Exhaustion
+        </pre>
+
+        <h2>3. The 8 Behavioral Heuristics & Scoring Engine</h2>
+        <p>
+            The threat score is calculated across a <strong>60-second sliding time window</strong> according to the formula:
+        </p>
+        <div class="formula-box">
+            Total Suspicion Score = min(100, &sum; [S1 + S2 + S3 + S4 + S5 + S6 + S7 + S8])
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Signal #</th>
+                    <th>Heuristic Signal</th>
+                    <th>Max Points</th>
+                    <th>Mathematical Calculation Rule</th>
+                    <th>Threat Meaning</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>S1</strong></td>
+                    <td>Sequential IDs</td>
+                    <td>20 pts</td>
+                    <td><code>min(20, (consecutive_ids / 15) * 20)</code></td>
+                    <td>Iterating <code>/employees/1..N</code> sequentially indicates automated database dumping.</td>
+                </tr>
+                <tr>
+                    <td><strong>S2</strong></td>
+                    <td>Deep Pagination</td>
+                    <td>15 pts</td>
+                    <td><code>min(15, (max_page_requested / 10) * 15)</code></td>
+                    <td>Browsing past page 10. Legitimate humans rarely inspect deep pagination.</td>
+                </tr>
+                <tr>
+                    <td><strong>S3</strong></td>
+                    <td>Failed Logins</td>
+                    <td>15 pts</td>
+                    <td><code>min(15, (failed_401_count / 5) * 15)</code></td>
+                    <td>Multiple 401 Unauthorized errors indicate brute force or credential stuffing.</td>
+                </tr>
+                <tr>
+                    <td><strong>S4</strong></td>
+                    <td>Sensitive Paths</td>
+                    <td>10 pts</td>
+                    <td><code>min(10, (distinct_sensitive_paths / 4) * 10)</code></td>
+                    <td>Probing sensitive endpoints like <code>/salary</code>, <code>/admin/security</code>, or <code>/audit</code>.</td>
+                </tr>
+                <tr>
+                    <td><strong>S5</strong></td>
+                    <td>Keyword Searches</td>
+                    <td>10 pts</td>
+                    <td><code>min(10, (sensitive_keywords / 10) * 10)</code></td>
+                    <td>Search queries looking for <code>password</code>, <code>salary</code>, <code>admin</code>, or <code>leak</code>.</td>
+                </tr>
+                <tr>
+                    <td><strong>S6</strong></td>
+                    <td>Request Velocity</td>
+                    <td>20 pts</td>
+                    <td><code>min(20, (requests_per_minute / 60) * 20)</code></td>
+                    <td>High-speed automated traffic exceeding human reading capability (&ge; 60 requests/min).</td>
+                </tr>
+                <tr>
+                    <td><strong>S7</strong></td>
+                    <td>Fast Request Intervals</td>
+                    <td>5 pts</td>
+                    <td><code>min(5, (gaps_under_0_3s / 10) * 5)</code></td>
+                    <td>Inhuman sub-second gaps between consecutive HTTP requests (&lt; 300 ms).</td>
+                </tr>
+                <tr>
+                    <td><strong>S8</strong></td>
+                    <td>Automated User-Agent</td>
+                    <td>5 pts</td>
+                    <td><code>Flat 5 pts if User-Agent matches bot / curl / python</code></td>
+                    <td>Identifies non-browser client libraries (e.g. <code>curl</code>, <code>python-requests</code>, <code>httpx</code>).</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>4. The Web Application: <code>employee_app</code></h2>
+        <h3>A. Backend Architecture</h3>
+        <ul>
+            <li><strong>Framework</strong>: FastAPI (Python 3.14 / ASGI asynchronous high-throughput engine).</li>
+            <li><strong>Dual-Database Design</strong>:
+                <ul>
+                    <li><code>employee.db</code>: Real corporate records (employees, salaries, departments, attendance).</li>
+                    <li><code>security.db</code>: Completely isolated security telemetry (access logs, blocked IPs, system metrics, honeypot sessions).</li>
+                </ul>
+            </li>
+            <li><strong>SQLite WAL Mode</strong>: Both databases operate under Write-Ahead Logging (<code>PRAGMA journal_mode=WAL;</code>) for simultaneous multi-reader and multi-writer concurrency.</li>
+            <li><strong>Authentication</strong>: JSON Web Tokens (JWT) using HMAC-SHA256 (<code>HS256</code>) and PassLib Bcrypt password hashing.</li>
+        </ul>
+
+        <h3>B. Self-Registration & Role-Based Access Control (RBAC)</h3>
+        <p>The system supports dynamic self-registration for three distinct roles without needing hardcoded scripts:</p>
+        <ol>
+            <li><strong>Employee (<code>role: employee</code>)</strong>: Self-service portal (<code>/dashboard/me</code>). Views personal profile, department, daily attendance, and individual salary slips.</li>
+            <li><strong>HR Manager (<code>role: hr</code>)</strong>: Enterprise portal (<code>/dashboard/hr</code>). Manages company personnel, departments, and attendance records.</li>
+            <li><strong>Security Administrator (<code>role: admin</code>)</strong>: SOC monitoring console (<code>/admin/security-dashboard</code>). Inspects live suspicion scores, views the 8 heuristic breakdowns, executes 1-click IP suspensions, and tracks honeypot telemetry.</li>
+        </ol>
+
+        <h2>5. Attacker Simulator & LLM Context Exhaustion</h2>
+        <h3>A. Simulator Scenarios</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Scenario</th>
+                    <th>Target Behavior</th>
+                    <th>Expected Score</th>
+                    <th>Outcome</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>normal_browse</code></td>
+                    <td>Legitimate human traffic, random delays, normal browser headers.</td>
+                    <td>8–10 / 100 (NORMAL)</td>
+                    <td>Normal access granted; real data returned.</td>
+                </tr>
+                <tr>
+                    <td><code>pagination_only</code></td>
+                    <td>Deep pagination scraping through <code>/employees?page=N</code>.</td>
+                    <td>35–50 / 100 (ELEVATED)</td>
+                    <td>Elevated alert on dashboard.</td>
+                </tr>
+                <tr>
+                    <td><code>rapid_enumeration</code></td>
+                    <td>Rapid sequential ID scraping (<code>/employees/1..N</code>) with 0 delay.</td>
+                    <td>&ge; 80 / 100 (TRAP)</td>
+                    <td>Intercepted and fed synthetic honeypot records.</td>
+                </tr>
+                <tr>
+                    <td><code>mixed</code></td>
+                    <td>Reconnaissance + failed credential brute-forcing + scraping.</td>
+                    <td>&ge; 80 / 100 (TRAP)</td>
+                    <td>Score surges; trapped and logged.</td>
+                </tr>
+                <tr>
+                    <td><code>full_lifecycle</code></td>
+                    <td>Full attack cycle: reconnaissance &rarr; failed login &rarr; enumeration &rarr; trap &rarr; block.</td>
+                    <td>85–100 / 100 (BLOCKED)</td>
+                    <td>Attacker trapped and temporarily suspended.</td>
+                </tr>
+                <tr>
+                    <td><code>context_exhaustion</code></td>
+                    <td>Consumes infinite decoy data stream to saturate LLM context buffer.</td>
+                    <td>100 / 100 (SATURATED)</td>
+                    <td>Token meter records context window saturation.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>B. LLM Token Metering & Context Saturation</h3>
+        <p>
+            Autonomous scrapers frequently leverage LLMs (e.g. GPT-4, Claude) to parse stolen web pages. LLMs have strict <strong>Context Windows</strong> (e.g. 8k, 32k, or 128k tokens).
+        </p>
+        <p>
+            The project integrates <code>token_service.py</code> utilizing OpenAI's <code>tiktoken</code> library with the <code>cl100k_base</code> Byte-Pair Encoding. The honeypot generates vast, structurally convincing synthetic JSON streams that overwhelm the LLM's prompt buffer, exhausting its memory and multiplying API costs for the attacker.
+        </p>
+
+        <h2>6. Comparative Evaluation & Benchmark Results</h2>
+        <div class="card-box">
+            <strong>Data Protection Benchmark Formula:</strong><br>
+            <code>Protection Rate (%) = [1 - (Real Records Leaked in Treatment / Real Records Leaked in Baseline)] * 100%</code>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Evaluation Metric</th>
+                    <th>Baseline Mode (Honeypot OFF)</th>
+                    <th>Treatment Mode (Honeypot ON)</th>
+                    <th>Improvement & Security Impact</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Real Records Leaked</strong></td>
+                    <td>300+ Records (Complete Exfiltration)</td>
+                    <td>0 to 10 Records (Initial probes only)</td>
+                    <td><strong>95.0% to 100.0% Protected</strong></td>
+                </tr>
+                <tr>
+                    <td><strong>Fake Records Served</strong></td>
+                    <td>0 Records</td>
+                    <td>Hundreds of synthetic decoys</td>
+                    <td>Adversary database is poisoned</td>
+                </tr>
+                <tr>
+                    <td><strong>Attacker Status</strong></td>
+                    <td>Continues unchallenged</td>
+                    <td>Diverted to trap & suspended</td>
+                    <td>Adversary waste of time & compute</td>
+                </tr>
+                <tr>
+                    <td><strong>Context Exhaustion</strong></td>
+                    <td>Not triggered</td>
+                    <td>Triggered (100k+ tokens consumed)</td>
+                    <td>Autonomous agent crashed/halted</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>7. Complete Directory & File Structure</h2>
+        <pre>
+AI-Based-HoneyPot-System/
+├── run_experiments.py               # Master CLI harness executing Baseline vs Treatment comparative tests
+├── README.md                        # Documentation and run instructions
+│
+├── employee_app/                    # Core Web Application, Telemetry, and Defense Engine
+│   ├── main.py                      # FastAPI app entry point, routing table, and middleware registration
+│   ├── config.py                    # Global configuration (keys, thresholds, seed formulas, durations)
+│   ├── database.py                  # Primary SQLite connection for real business data (employee.db)
+│   ├── security_database.py         # Isolated SQLite connection for security telemetry (security.db)
+│   ├── seed_employees.py            # CLI script to populate employee.db with synthetic initial employees
+│   │
+│   ├── middleware/                  # ASGI Interceptors
+│   │   ├── ip_blocker.py            # Enforces temporary IP blocks; serves blocked.html / JSON 403
+│   │   └── request_logger.py        # Asynchronous access logger and velocity tracker
+│   │
+│   ├── routes/                      # API and HTML Route Handlers
+│   │   ├── auth.py                  # Self-registration (Employee/HR/Admin), login, and JWT issuance
+│   │   ├── admin_security.py        # Security REST API and WebSocket (/ws/admin) handler
+│   │   ├── trap.py                  # Decoy endpoints (/api/trap/records, infinite streams)
+│   │   ├── employees.py             # Employee CRUD operations and directory pagination
+│   │   ├── departments.py           # Department listing and management
+│   │   ├── payroll.py               # Confidential salary and payroll retrieval
+│   │   ├── attendance.py            # Attendance logging and status tracking
+│   │   └── dashboard.py             # Role-specific dashboard endpoints (/dashboard/admin, /hr, /me)
+│   │
+│   ├── models/                      # SQLAlchemy Database Schema Definitions
+│   │   ├── user.py                  # User authentication credentials and role assignments
+│   │   ├── employee.py              # Personnel profiles and contact details
+│   │   ├── department.py            # Organizational department structures
+│   │   ├── salary.py                # Confidential employee salary numbers
+│   │   ├── attendance.py            # Daily attendance check-in records
+│   │   └── security.py              # Security models: RequestLog, BlockedIP, TrapMetric, SystemMetric
+│   │
+│   ├── services/                    # Autonomous Business & Defense Services
+│   │   ├── auth_service.py          # Bcrypt password hashing & JWT token encoding/decoding
+│   │   ├── detection_service.py     # 8-Signal sliding-window heuristic scoring engine
+│   │   ├── trap_service.py          # Deterministic Faker decoy data generator
+│   │   ├── token_service.py         # tiktoken LLM token meter for context window tracking
+│   │   ├── blocking_service.py      # IP block enforcement and escalation logic
+│   │   ├── system_metrics_service.py# psutil CPU/RAM/traffic telemetry sampler
+│   │   ├── ws_manager.py            # WebSocket manager for live admin broadcast
+│   │   └── request_utils.py         # Client IP extraction and JWT header parsing
+│   │
+│   ├── templates/                   # Jinja2 HTML Templates
+│   │   ├── login.html               # Authentication portal with self-contained styling
+│   │   ├── register.html            # Registration portal with Employee/HR/Admin role selector
+│   │   ├── blocked.html             # Animated 403 screen with live ticking countdown timer
+│   │   ├── dashboard.html           # Unified enterprise employee/HR/admin portal
+│   │   ├── employees.html           # Corporate employee directory table
+│   │   ├── departments.html         # Corporate departments list
+│   │   ├── payroll.html             # Confidential payroll review table
+│   │   ├── attendance.html          # Daily attendance registry
+│   │   └── admin/
+│   │       └── security_dashboard.html # SOC dashboard with real-time heuristic graphs & block buttons
+│   │
+│   ├── static/                      # Static Assets (Stylesheets & Scripts)
+│   │   ├── css/style.css            # Base corporate CSS styles and animations
+│   │   └── js/
+│   │       ├── app.js               # Global application logic, auth handling, and dashboard switcher
+│   │       ├── security_dashboard.js# SOC dashboard JavaScript, WebSocket client, and heuristic cards
+│   │       ├── employees.js         # Employee directory AJAX interactions
+│   │       └── departments.js       # Department management scripts
+│   │
+│   ├── database/                    # Persistent SQLite Storage Directory
+│   │   ├── employee.db              # Real corporate data store
+│   │   └── security.db              # Isolated security telemetry and blocks store
+│   │
+│   └── fake_logs/                   # Honeypot Decoy Audit Storage
+│       ├── trap_fake_activity.log   # Chronological log of synthetic records served
+│       └── fake_trap_data_*.json    # Captured synthetic payloads fed to attackers
+│
+└── attacker_simulator/              # Autonomous Attacker Agent
+    ├── simulator.py                 # Multi-scenario scraper and LLM attacker simulator
+    ├── config.py                    # Attacker targets, delay profiles, and scenario rules
+    ├── README.md                    # Simulator user guide and CLI argument reference
+    └── reports/                     # Audit trails, real vs fake data dumps, and JSON test reports
+        </pre>
+
+        <h2>8. Viva Voce & Demonstration Walkthrough</h2>
+        <ol>
+            <li><strong>Start App</strong>: <code>cd employee_app && ./venv/bin/uvicorn main:app --reload --port 8000</code>.</li>
+            <li><strong>Show Registration</strong>: Open <code>http://127.0.0.1:8000/register</code>, select <strong>HR Portal</strong>, register account, observe automatic redirect to <code>/login</code> with pre-filled username.</li>
+            <li><strong>Open SOC Dashboard</strong>: Open <code>http://127.0.0.1:8000/admin/security-dashboard</code> in a second tab.</li>
+            <li><strong>Demonstrate Normal Score (&lt; 80)</strong>: Run <code>./attacker_simulator/.venv/bin/python3 simulator.py --scenario normal_browse --requests 10</code>. Show dashboard score stays green (~8-10 / 100).</li>
+            <li><strong>Demonstrate Threat Score (&ge; 80) & Honeypot</strong>: Run <code>simulator.py --scenario full_lifecycle --requests 50</code>. Show score surge past 80, turn red (TRAP), and fake logs generated in <code>employee_app/fake_logs/</code>.</li>
+            <li><strong>Demonstrate Browser 403 Block</strong>: Click the red <strong>🚫 Block</strong> button next to <code>127.0.0.1</code> on the dashboard. In client tab, refresh to reveal the animated 403 screen with pulsing shield and live ticking countdown timer.</li>
+            <li><strong>Run Comparative Benchmark</strong>: Run <code>python3 run_experiments.py</code> to demonstrate 100.0% data protection.</li>
+        </ol>
+
+    </div>
+
+</body>
+</html>
+

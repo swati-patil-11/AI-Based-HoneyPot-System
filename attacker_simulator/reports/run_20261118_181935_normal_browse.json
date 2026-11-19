@@ -1,0 +1,88 @@
+{
+  "run_id": "run_20261118_181935_normal_browse",
+  "target_url": "http://127.0.0.1:8000",
+  "auth_user": "hr",
+  "scenario": "normal_browse",
+  "stop_reason": "NORMAL_BROWSE_COMPLETED",
+  "start_time_utc": "2026-11-18T12:49:31.908783+00:00",
+  "end_time_utc": "2026-11-18T12:49:35.797592+00:00",
+  "duration_seconds": 3.89,
+  "token_counter_method": "tiktoken:cl100k_base",
+  "summary": {
+    "total_requests": 5,
+    "total_tokens_consumed": 946,
+    "token_budget": 50000,
+    "token_budget_exhausted": false,
+    "real_records_obtained": 10,
+    "fake_records_obtained": 0,
+    "unique_real_records": 10,
+    "unique_fake_records": 0,
+    "real_data_file": "/home/choti/Desktop/AI-Based-HoneyPot-System/attacker_simulator/reports/real_data_captured_20261118_181935.json",
+    "fake_data_file": "/home/choti/Desktop/AI-Based-HoneyPot-System/attacker_simulator/reports/fake_data_captured_20261118_181935.json",
+    "is_ip_blocked": false,
+    "max_requests_cap": 200,
+    "time_cap_seconds": 120.0
+  },
+  "request_log": [
+    {
+      "req_num": 1,
+      "timestamp": "2026-11-18T12:49:32.414940+00:00",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "status_code": 200,
+      "tokens": 143,
+      "cumulative_tokens": 143,
+      "real_records": 0,
+      "fake_records": 0,
+      "note": "Login successful"
+    },
+    {
+      "req_num": 2,
+      "timestamp": "2026-11-18T12:49:33.480144+00:00",
+      "method": "GET",
+      "endpoint": "/departments/",
+      "status_code": 200,
+      "tokens": 67,
+      "cumulative_tokens": 210,
+      "real_records": 0,
+      "fake_records": 0,
+      "note": "Probe succeeded (HTTP 200)"
+    },
+    {
+      "req_num": 3,
+      "timestamp": "2026-11-18T12:49:34.073933+00:00",
+      "method": "GET",
+      "endpoint": "/employees/?page=1&size=10",
+      "status_code": 200,
+      "tokens": 722,
+      "cumulative_tokens": 932,
+      "real_records": 10,
+      "fake_records": 0,
+      "note": "All 10 records real"
+    },
+    {
+      "req_num": 4,
+      "timestamp": "2026-11-18T12:49:34.647278+00:00",
+      "method": "GET",
+      "endpoint": "/employees/me",
+      "status_code": 403,
+      "tokens": 13,
+      "cumulative_tokens": 945,
+      "real_records": 0,
+      "fake_records": 0,
+      "note": "Role-based 403 (Authorized refusal, IP not blocked)"
+    },
+    {
+      "req_num": 5,
+      "timestamp": "2026-11-18T12:49:35.230605+00:00",
+      "method": "GET",
+      "endpoint": "/employees/search?q=engineer&page=1&size=5",
+      "status_code": 200,
+      "tokens": 1,
+      "cumulative_tokens": 946,
+      "real_records": 0,
+      "fake_records": 0,
+      "note": "Search 'engineer' returned 0 items (0 synthetic)"
+    }
+  ]
+}

@@ -14,10 +14,11 @@ Settings are read from config at call time, so experiments can change them.
 """
 
 import json
+import os
 import re
 import time
 from dataclasses import dataclass, field
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
 
 from sqlalchemy.orm import Session
 
@@ -27,6 +28,39 @@ from security_database import SecuritySessionLocal, utcnow
 from services import synthetic_data_service as synthetic
 from services import token_service
 from services.ws_manager import manager as ws_manager
+
+
+def log_fake_trap_data(session_id: int, ip: str, endpoint: str, records: list[dict], tokens: int = 0):
+    """
+    Saves generated synthetic (fake) records to dedicated files in FAKE_LOGS_DIR.
+    Ensures that whenever the trap is active, fake logs are recorded in newly generated files.
+    """
+    try:
+        os.makedirs(cfg.FAKE_LOGS_DIR, exist_ok=True)
+        now_str = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+        file_path = os.path.join(cfg.FAKE_LOGS_DIR, f"fake_trap_session_{session_id}_{now_str}.json")
+
+        entry = {
+            "session_id": session_id,
+            "ip_address": ip,
+            "endpoint": endpoint,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "records_count": len(records),
+            "tokens": tokens,
+            "fake_records": records,
+        }
+
+        with open(file_path, "w", encoding="utf-8") as f:
+            json.dump(entry, f, indent=2)
+
+        log_file = os.path.join(cfg.FAKE_LOGS_DIR, "trap_fake_activity.log")
+        with open(log_file, "a", encoding="utf-8") as f:
+            f.write(
+                f"[{entry['timestamp']}] [TRAP ACTIVE] IP: {ip} | Session: #{session_id} | "
+                f"Endpoint: {endpoint} | Fake Records: {len(records)} | Tokens: {tokens} | File: {file_path}\n"
+            )
+    except Exception as exc:
+        print(f"[trap_service] Error writing fake log file: {exc}")
 
 
 ITEM_PATH = re.compile(r"^/employees/(\d+)$")
@@ -56,7 +90,7 @@ def _int(value, default):
 def classify_request(method: str, path: str, params) -> dict | None:
     """
     Decide if a request is one the trap can answer.
-    Covers GET /employees/, /employees/search and /employees/{id}.
+    Covers GET /employees/, /employees/search, /employees/{id}, and /salary/.
     Everything else (including /employees/me and the HTML pages)
     is left alone. Returns None when the request should go to the real app.
     """
@@ -67,6 +101,9 @@ def classify_request(method: str, path: str, params) -> dict | None:
 
     page = _int(params.get("page"), 1)
     size = _int(params.get("size"), 20)
+
+    if clean == "/salary":
+        return {"kind": "salary", "page": page, "size": size}
 
     if page < 1 or not 1 <= size <= 100:
         return None                      # the real endpoint will answer 422
@@ -309,21 +346,43 @@ def serve_redirected(ip: str, plan: dict) -> TrapReply:
             ids = [plan["item_id"]]
         elif kind == "list":
             ids = synthetic.page_ids(plan["page"], plan["size"])
+        elif kind == "salary":
+            ids = synthetic.page_ids(plan.get("page", 1), plan.get("size", 20))
         else:
             ids = synthetic.search_ids(plan["query"], plan["page"], plan["size"])
 
         records = []
         total_bytes = 0
 
-        for record_id in ids[:remaining]:
-            record = synthetic.make_record(record_id)
-            size = synthetic.record_size(record)
+        if kind == "salary":
+            for record_id in ids[:remaining]:
+                emp = synthetic.make_record(record_id)
+                sal = {
+                    "salary_id": record_id,
+                    "employee_id": emp["id"],
+                    "employee_code": emp["employee_id"],
+                    "employee_name": f"{emp['first_name']} {emp['last_name']}",
+                    "email": emp["email"],
+                    "basic_salary": 45000.0 + (record_id * 100 % 25000),
+                    "allowances": 5000.0,
+                    "deductions": 2000.0,
+                    "net_salary": 48000.0 + (record_id * 100 % 25000),
+                }
+                size = len(json.dumps(sal).encode())
+                if total_bytes + size > cfg.MAX_RESPONSE_SIZE:
+                    break
+                records.append(sal)
+                total_bytes += size
+        else:
+            for record_id in ids[:remaining]:
+                record = synthetic.make_record(record_id)
+                size = synthetic.record_size(record)
 
-            if total_bytes + size > cfg.MAX_RESPONSE_SIZE:
-                break
+                if total_bytes + size > cfg.MAX_RESPONSE_SIZE:
+                    break
 
-            records.append(record)
-            total_bytes += size
+                records.append(record)
+                total_bytes += size
 
         if not records:
             # MAX_RESPONSE_SIZE is smaller than a single record (config error)
@@ -343,6 +402,15 @@ def serve_redirected(ip: str, plan: dict) -> TrapReply:
             body_bytes,
             tokens,
             response_ms=round((time.perf_counter() - started) * 1000, 2),
+        )
+
+        # Requirement 4: Store fake logs and records in newly generated files
+        log_fake_trap_data(
+            session_id=session.id,
+            ip=ip,
+            endpoint=f"/employees ({kind})" if kind != "salary" else "/salary",
+            records=records,
+            tokens=tokens,
         )
 
         if total_records >= cfg.MAX_TRAP_RECORDS:

@@ -1,7 +1,10 @@
 import os
+from pathlib import Path
 
 from dotenv import load_dotenv
 
+# Load from employee_app/.env or current working directory
+load_dotenv(Path(__file__).resolve().parent / ".env")
 load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY")
@@ -48,7 +51,11 @@ SHORT_INTERVAL_SECONDS = 0.3           # a gap below this counts as "very short"
 # Score levels (lowest score of each level)
 LEVEL_MONITOR = 31
 LEVEL_SUSPICIOUS = 61
-TRAP_THRESHOLD = int(os.getenv("TRAP_THRESHOLD", "75"))                    # score >= this means "trap level"
+TRAP_THRESHOLD = int(os.getenv("TRAP_THRESHOLD", "80"))                    # score >= this means "trap level"
+
+# Directory where synthetic trap logs and records are stored when trap is active
+FAKE_LOGS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fake_logs")
+os.makedirs(FAKE_LOGS_DIR, exist_ok=True)
 
 AUTOMATED_UA_KEYWORDS = (
     "python", "httpx", "requests", "aiohttp", "curl", "wget", "scrapy",

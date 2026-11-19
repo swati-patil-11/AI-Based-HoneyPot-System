@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "employee_id": "EMP20001",
+    "email": "emp1@corp-example.com"
+  },
+  {
+    "id": 2,
+    "employee_id": "EMP20002",
+    "email": "emp2@corp-example.com"
+  },
+  {
+    "id": 1,
+    "employee_id": "EMP20001",
+    "email": "emp1@corp-example.com"
+  },
+  {
+    "id": 2,
+    "employee_id": "EMP20002",
+    "email": "emp2@corp-example.com"
+  },
+  {
+    "id": 1,
+    "employee_id": "EMP20001",
+    "email": "emp1@corp-example.com"
+  },
+  {
+    "id": 2,
+    "employee_id": "EMP20002",
+    "email": "emp2@corp-example.com"
+  }
+]

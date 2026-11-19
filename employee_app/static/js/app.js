@@ -38,6 +38,35 @@ async function apiFetch(url, options = {}) {
 
 
 // ============================================================
+// AUTH UTILITIES & DEMO HELPERS
+// ============================================================
+
+function togglePasswordVisibility(inputId, iconId) {
+    const input = document.getElementById(inputId);
+    const icon = document.getElementById(iconId);
+    if (!input) return;
+
+    if (input.type === "password") {
+        input.type = "text";
+        if (icon) icon.textContent = "🙈";
+    } else {
+        input.type = "password";
+        if (icon) icon.textContent = "👁️";
+    }
+}
+
+function escapeHtml(str) {
+    if (!str) return "";
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+
+// ============================================================
 // LOGIN
 // ============================================================
 
@@ -47,12 +76,20 @@ async function handleLogin(event) {
     const username = document.getElementById("username")?.value.trim();
     const password = document.getElementById("password")?.value;
     const message = document.getElementById("loginMessage");
+    const submitBtn = document.getElementById("loginSubmitBtn");
 
     if (!username || !password) {
         if (message) {
-            message.textContent = "Please enter username and password.";
+            message.className = "message-box alert-error";
+            message.style.display = "block";
+            message.textContent = "Please enter both username and password.";
         }
         return;
+    }
+
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Signing in...";
     }
 
     try {
@@ -70,21 +107,129 @@ async function handleLogin(event) {
         const data = await response.json();
 
         if (!response.ok) {
-            throw new Error(data.detail || "Login failed.");
+            if (response.status === 403 && String(data.detail || "").toLowerCase().includes("blocked")) {
+                const blockedErr = new Error("🚫 Access Denied: Your IP address is temporarily blocked. Login access is revoked.");
+                blockedErr.isBlocked = true;
+                throw blockedErr;
+            }
+            throw new Error(data.detail || "Login failed. Check your username and password.");
+        }
+
+        // Login Succeeded
+        if (message) {
+            message.className = "message-box alert-success";
+            message.style.display = "block";
+            message.innerHTML = `<strong>✓ Login Successful!</strong> Welcome back, <strong>${escapeHtml(data.user?.username || username)}</strong>. Redirecting to dashboard...`;
         }
 
         localStorage.setItem("access_token", data.access_token);
         localStorage.setItem("username", data.user.username);
         localStorage.setItem("role", data.user.role);
 
-        window.location.href = "/dashboard";
+        setTimeout(() => {
+            window.location.href = "/dashboard";
+        }, 600);
 
     } catch (error) {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Sign In";
+        }
         if (message) {
+            message.className = error.isBlocked ? "message-box alert-blocked" : "message-box alert-error";
+            message.style.display = "block";
             message.textContent = error.message || "Login failed.";
         }
     }
 }
+
+
+// ============================================================
+// REGISTRATION
+// ============================================================
+
+async function handleRegister(event) {
+    event.preventDefault();
+
+    const username = document.getElementById("registerUsername")?.value.trim();
+    const email = document.getElementById("registerEmail")?.value.trim();
+    const password = document.getElementById("registerPassword")?.value;
+    const message = document.getElementById("registerMessage");
+    const submitBtn = document.getElementById("registerSubmitBtn");
+
+    const roleRadio = document.querySelector('input[name="accountRole"]:checked');
+    const role = roleRadio ? roleRadio.value : "employee";
+
+    if (!username || !email || !password) {
+        if (message) {
+            message.className = "message-box alert-error";
+            message.style.display = "block";
+            message.textContent = "Please fill in all required fields.";
+        }
+        return;
+    }
+
+    if (password.length < 4) {
+        if (message) {
+            message.className = "message-box alert-error";
+            message.style.display = "block";
+            message.textContent = "Password must be at least 4 characters long.";
+        }
+        return;
+    }
+
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Creating account...";
+    }
+
+    try {
+        const response = await fetch("/auth/register", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                username,
+                email,
+                password,
+                role
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.detail || "Registration failed. Please try another username or email.");
+        }
+
+        const roleLabel = { admin: "Administrator", hr: "HR Manager", employee: "Employee" }[role] || "User";
+
+        // Registration Succeeded!
+        if (message) {
+            message.className = "message-box alert-success";
+            message.style.display = "block";
+            message.innerHTML = `<strong>✓ Account Created!</strong> Registered as <strong>${escapeHtml(roleLabel)}</strong>. Redirecting to sign in...`;
+        }
+
+        // Smooth transition to login page after brief confirmation
+        setTimeout(() => {
+            window.location.href = `/login?registered=true&user=${encodeURIComponent(username)}&role=${encodeURIComponent(role)}`;
+        }, 900);
+
+    } catch (error) {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Create Account";
+        }
+        if (message) {
+            message.className = "message-box alert-error";
+            message.style.display = "block";
+            message.textContent = error.message || "Registration failed.";
+        }
+    }
+}
+
 
 
 // ============================================================
@@ -394,9 +539,44 @@ document.addEventListener("DOMContentLoaded", () => {
     configureSidebar();
 
     const loginForm = document.getElementById("loginForm");
-
     if (loginForm) {
         loginForm.addEventListener("submit", handleLogin);
+
+        // Check if user was just redirected from registration
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get("registered") === "true") {
+            const message = document.getElementById("loginMessage");
+            const registeredUser = urlParams.get("user") || "";
+            const registeredRole = urlParams.get("role") || "employee";
+            const roleLabel = { admin: "Administrator", hr: "HR Manager", employee: "Employee" }[registeredRole] || "User";
+
+            if (message) {
+                message.className = "message-box alert-success";
+                message.style.display = "block";
+                message.innerHTML = `<strong>✓ Registration Successful!</strong> ${roleLabel} account <strong>${escapeHtml(registeredUser)}</strong> created. Please enter your password to sign in.`;
+            }
+
+            if (registeredUser) {
+                const usernameInput = document.getElementById("username");
+                if (usernameInput) {
+                    usernameInput.value = registeredUser;
+                }
+                const passwordInput = document.getElementById("password");
+                if (passwordInput) {
+                    passwordInput.focus();
+                }
+            }
+
+            // Clean query parameters from URL bar without page refresh
+            if (window.history && window.history.replaceState) {
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }
+    }
+
+    const registerForm = document.getElementById("registerForm");
+    if (registerForm) {
+        registerForm.addEventListener("submit", handleRegister);
     }
 
     const isDashboardPage =

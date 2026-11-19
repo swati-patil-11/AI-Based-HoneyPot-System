@@ -44,10 +44,13 @@ Use the `--scenario` flag to select an attack pattern:
 | Scenario | Description |
 | :--- | :--- |
 | `mixed` *(default)* | Full autonomous agent workflow: endpoint probing -> decoy stream exploitation -> pagination walking -> sequential ID walking -> keyword searches. |
-| `id_walk_only` | Sequential `GET /employees/{id}` walking (demonstrates the limitation where low-rate ID walking stays below the 81 suspicion threshold). |
+| `normal_browse` | Benign user browsing (demonstrates normal suspicion score staying well below the 80 threshold). |
+| `context_exhaustion` | Direct decoy stream consumption (demonstrates simulated AI agent context window saturation & exhaustion). |
+| `id_walk_only` | Sequential `GET /employees/{id}` walking (demonstrates low-rate ID walking staying below the 80 suspicion threshold). |
 | `pagination_only` | Deep pagination walking `GET /employees/?page=N&size=M`. |
 | `decoy_only` | Direct consumption of the decoy legacy export stream `GET /api/trap/records`. |
 | `search_only` | Repeated search queries `GET /employees/search?q=...`. |
+| `full_lifecycle` | End-to-end 5-stage attack lifecycle: score below 80 -> crossing 80 -> trap engagement -> auto-blocking -> login access denied verification. |
 
 Example:
 ```bash

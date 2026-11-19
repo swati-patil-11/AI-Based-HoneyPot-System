@@ -1,0 +1,40 @@
+{
+  "run_id": "run_20261118_113135_normal_browse",
+  "target_url": "http://127.0.0.1:8001",
+  "auth_user": "hr",
+  "scenario": "normal_browse",
+  "stop_reason": "LOGIN_FAILED_0",
+  "start_time_utc": "2026-11-18T06:01:35.287899+00:00",
+  "end_time_utc": "2026-11-18T06:01:35.402745+00:00",
+  "duration_seconds": 0.11,
+  "token_counter_method": "tiktoken:cl100k_base",
+  "summary": {
+    "total_requests": 1,
+    "total_tokens_consumed": 11,
+    "token_budget": 50000,
+    "token_budget_exhausted": false,
+    "real_records_obtained": 0,
+    "fake_records_obtained": 0,
+    "unique_real_records": 0,
+    "unique_fake_records": 0,
+    "real_data_file": "/home/choti/Desktop/AI-Based-HoneyPot-System/attacker_simulator/reports/real_data_captured_20261118_113135.json",
+    "fake_data_file": "/home/choti/Desktop/AI-Based-HoneyPot-System/attacker_simulator/reports/fake_data_captured_20261118_113135.json",
+    "is_ip_blocked": false,
+    "max_requests_cap": 200,
+    "time_cap_seconds": 120.0
+  },
+  "request_log": [
+    {
+      "req_num": 1,
+      "timestamp": "2026-11-18T06:01:35.352586+00:00",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "status_code": 0,
+      "tokens": 11,
+      "cumulative_tokens": 11,
+      "real_records": 0,
+      "fake_records": 0,
+      "note": "Login failed"
+    }
+  ]
+}

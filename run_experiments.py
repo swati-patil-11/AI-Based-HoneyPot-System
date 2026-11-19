@@ -236,6 +236,10 @@ def print_comparison_matrix(comparison: dict, save_file: Path | None = None):
         f"3. Resource Overhead: CPU delta was {a['peak_cpu_delta']:+.2f}%, "
         f"RAM delta was {a['peak_memory_delta']:+.2f}%, confirming negligible server load."
     )
+    matrix_lines.append("\nDATA INTEGRITY & DECEPTION VERIFICATION:")
+    matrix_lines.append(f"• Baseline Exfiltrated: {a['real_records_stolen_baseline']} Real DB Records (0% Protection)")
+    matrix_lines.append(f"• Treatment Protected:  {a['real_data_protected_percent']:.1f}% Shielded ({a['fake_records_injected']} Synthetic Decoys Injected)")
+    matrix_lines.append("• Fake Honeypot Logs:   Persisted to employee_app/fake_logs/ and attacker_simulator/reports/")
     matrix_lines.append("=" * 78 + "\n")
 
     full_output = "\n".join(matrix_lines)

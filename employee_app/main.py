@@ -142,6 +142,7 @@ async def ws_admin_endpoint(websocket: WebSocket, token: str | None = None):
 # ---------------------------------------------------------
 
 @app.get("/", response_class=HTMLResponse)
+@app.get("/login", response_class=HTMLResponse)
 def home(request: Request):
 
     return templates.TemplateResponse(

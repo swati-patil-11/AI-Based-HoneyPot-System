@@ -452,34 +452,181 @@ document.addEventListener("DOMContentLoaded", function () {
         const m = s.metrics || s.measured_values || {};
 
         const items = [
-            { name: "🔢 Sequential IDs", pts: b.sequential_ids || 0, max: 20, desc: `${m.sequential_ids || 0} consecutive IDs (/employees/1..N)` },
-            { name: "📄 Deep Pagination", pts: b.pagination_depth || 0, max: 15, desc: `Depth: page ${m.pagination_depth || 0}` },
-            { name: "🔐 Failed Logins", pts: b.auth_failures || 0, max: 15, desc: `${m.auth_failures || 0} failed 401 attempts` },
-            { name: "🌐 Sensitive Paths", pts: b.distinct_endpoints || 0, max: 10, desc: `${m.distinct_endpoints || 0} distinct endpoints touched` },
-            { name: "🔍 Keyword Searches", pts: b.repeated_searches || 0, max: 10, desc: `${m.repeated_searches || 0} search queries executed` },
-            { name: "🚀 Request Velocity", pts: b.request_rate || 0, max: 20, desc: `${m.request_rate || 0} requests per minute` },
-            { name: "🤖 Automated User-Agent", pts: b.automated_user_agent || 0, max: 5, desc: m.automated_user_agent ? "Automated bot client detected" : "Browser User-Agent" },
-            { name: "⚡ Fast Intervals", pts: b.short_intervals || 0, max: 5, desc: `${m.short_intervals || 0} request gaps < 0.3s` }
+            {
+                name: "🔢 Sequential IDs",
+                category: "ID Enumeration",
+                pts: b.sequential_ids || 0,
+                max: 20,
+                observed: `${m.sequential_ids || 0} consecutive IDs`,
+                full_at: "≥ 10 IDs (Max penalty)",
+                scale: "2.0 pts / ID",
+                desc: "Crawling /employees/1..N sequentially indicates scripted database walking rather than human browsing.",
+            },
+            {
+                name: "📄 Deep Pagination",
+                category: "Catalog Exfiltration",
+                pts: b.pagination_depth || 0,
+                max: 15,
+                observed: `Page Depth: ${m.pagination_depth || 0}`,
+                full_at: "≥ Page 10 (Max penalty)",
+                scale: "1.5 pts / page",
+                desc: "Paging deeply through employee listings past normal viewing limits to harvest records in bulk.",
+            },
+            {
+                name: "🔐 Failed Logins (401)",
+                category: "Credential Stuffing",
+                pts: b.auth_failures || 0,
+                max: 15,
+                observed: `${m.auth_failures || 0} failed 401 attempts`,
+                full_at: "≥ 5 failures (Max penalty)",
+                scale: "3.0 pts / failure",
+                desc: "Repeated unauthorized 401 errors from incorrect passwords, signaling automated brute-force spraying.",
+            },
+            {
+                name: "🌐 Sensitive Paths",
+                category: "Sitemap Discovery",
+                pts: b.distinct_endpoints || 0,
+                max: 10,
+                observed: `${m.distinct_endpoints || 0} endpoints touched`,
+                full_at: "≥ 8 endpoints (Max penalty)",
+                scale: "1.25 pts / endpoint",
+                desc: "Sweeping across administrative and auxiliary endpoints (/users, /salary, /departments, /api/trap).",
+            },
+            {
+                name: "🔍 Keyword Searches",
+                category: "Directory Enumeration",
+                pts: b.repeated_searches || 0,
+                max: 10,
+                observed: `${m.repeated_searches || 0} searches executed`,
+                full_at: "≥ 10 queries (Max penalty)",
+                scale: "1.0 pt / search",
+                desc: "Repeated directory searches with broad keywords ('admin', 'manager', 'lead') to locate target profiles.",
+            },
+            {
+                name: "🚀 Request Velocity (RPM)",
+                category: "Throughput Anomaly",
+                pts: b.request_rate || 0,
+                max: 20,
+                observed: `${m.request_rate || 0} requests / min`,
+                full_at: "≥ 60 req/min (Max penalty)",
+                scale: "0.33 pts / (req/min)",
+                desc: "High-frequency request bursts exceeding normal human reading and navigation speed (>1 req/sec).",
+            },
+            {
+                name: "🤖 Automated User-Agent",
+                category: "Bot Identification",
+                pts: b.automated_user_agent || 0,
+                max: 5,
+                observed: m.automated_user_agent ? "Automated Library / Tool" : "Standard Web Browser",
+                full_at: "1 keyword match",
+                scale: "5.0 pts (Binary flag)",
+                desc: "Client identifies as python, httpx, requests, curl, or automated scraping script rather than a browser.",
+            },
+            {
+                name: "⚡ Sub-Human Latency",
+                category: "Timing Anomaly",
+                pts: b.short_intervals || 0,
+                max: 5,
+                observed: `${m.short_intervals || 0} intervals < 0.3s`,
+                full_at: "≥ 10 rapid intervals",
+                scale: "0.5 pts / rapid gap",
+                desc: "Back-to-back request intervals under 300ms without natural human reading or typing pauses.",
+            },
         ];
 
+        const isTrap = s.score >= 80;
+        const bannerBg = isTrap ? "#fef2f2" : "#f8fafc";
+        const bannerBorder = isTrap ? "#fca5a5" : "#e2e8f0";
+        const bannerTextColor = isTrap ? "#991b1b" : "#334155";
+
         return `
-            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 12px; margin: 4px 0;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
-                    <span style="font-size: 13px; font-weight: 700; color: #1e293b;">
-                        🛡️ Heuristic Detection Report for ${escapeHtml(s.ip_address)}: Total ${s.score}/100 (${escapeHtml(s.level || "NORMAL")})
-                    </span>
-                    <small style="color: #64748b;">Activation Threshold: 75 Points</small>
-                </div>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px;">
-                    ${items.map(it => `
-                        <div style="background: ${it.pts > 0 ? '#f0fdf4' : '#f8fafc'}; border: 1px solid ${it.pts > 0 ? '#bbf7d0' : '#e2e8f0'}; border-radius: 4px; padding: 6px 10px;">
-                            <div style="display:flex; justify-content:space-between; font-weight:600; font-size: 11px;">
-                                <span>${it.name}</span>
-                                <span style="color: ${it.pts > 0 ? '#16a34a' : '#64748b'};">+${it.pts} / ${it.max}</span>
-                            </div>
-                            <div style="font-size: 10px; color: #64748b; margin-top: 2px;">${escapeHtml(it.desc)}</div>
+            <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 14px; margin: 6px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                <!-- Header Banner -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+                    <div>
+                        <span style="font-size: 14px; font-weight: 700; color: #0f172a;">
+                            🛡️ Behavioral Heuristics Audit Report: ${escapeHtml(s.ip_address)}
+                        </span>
+                        <div style="font-size: 11px; color: #64748b; margin-top: 2px;">
+                            Evaluated across a 60-second sliding window | Combined Score: <strong>${s.score} / 100</strong> (${escapeHtml(s.level || "NORMAL")})
                         </div>
-                    `).join('')}
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <span style="font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 4px; background: ${isTrap ? '#fee2e2' : '#e0f2fe'}; color: ${isTrap ? '#b91c1c' : '#0369a1'};">
+                            ${isTrap ? '🚨 TRAP ACTIVATED (≥ 80 pts)' : '✅ BELOW THRESHOLD (< 80 pts)'}
+                        </span>
+                        <span style="font-size: 11px; color: #64748b; background: #f1f5f9; padding: 3px 8px; border-radius: 4px;">
+                            Activation Threshold: 80 Points
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Calibration Architecture Note -->
+                <div style="background: ${bannerBg}; border: 1px solid ${bannerBorder}; border-radius: 6px; padding: 8px 12px; margin-bottom: 12px; font-size: 11px; color: ${bannerTextColor}; line-height: 1.4;">
+                    <strong>ℹ️ Multi-Signal Calibration Architecture:</strong>
+                    The 8 behavioral heuristics sum to exactly 100 max points. Individual heuristics are weighted between 5 and 20 points so that no single benign user action (such as mistyping a password or browsing several pages) falsely triggers honeypot traps. Malicious bots and scrapers correlate across multiple vectors simultaneously, rapidly driving the combined score above the <strong>80-point threshold</strong>.
+                </div>
+
+                <!-- 8 Factor Cards Grid -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px;">
+                    ${items.map(it => {
+                        const pct = Math.min(100, Math.round((it.pts / it.max) * 100));
+                        const isMax = it.pts >= it.max;
+                        const isElevated = it.pts > 0;
+                        const cardBg = isMax ? "#fef2f2" : (isElevated ? "#fffbeb" : "#f8fafc");
+                        const cardBorder = isMax ? "#fca5a5" : (isElevated ? "#fde68a" : "#e2e8f0");
+                        const badgeColor = isMax ? "#dc2626" : (isElevated ? "#d97706" : "#64748b");
+                        const pillBg = isMax ? "#fee2e2" : (isElevated ? "#fef3c7" : "#e2e8f0");
+
+                        return `
+                        <div style="background: ${cardBg}; border: 1px solid ${cardBorder}; border-radius: 6px; padding: 10px 12px; display: flex; flex-direction: column; justify-content: space-between;">
+                            <div>
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
+                                    <div>
+                                        <div style="font-weight: 700; font-size: 12px; color: #0f172a;">${it.name}</div>
+                                        <div style="font-size: 10px; color: #64748b;">${it.category}</div>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <span style="font-weight: 800; font-size: 12px; color: ${badgeColor};">
+                                            +${it.pts} / ${it.max} pts
+                                        </span>
+                                        <div>
+                                            <span style="font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 10px; background: ${pillBg}; color: ${badgeColor};">
+                                                ${isMax ? 'MAX PENALTY' : (isElevated ? `${pct}% IMPACT` : 'CLEAN')}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Progress Bar -->
+                                <div style="width: 100%; height: 5px; background: #e2e8f0; border-radius: 3px; overflow: hidden; margin: 6px 0;">
+                                    <div style="width: ${pct}%; height: 100%; background: ${isMax ? '#ef4444' : (isElevated ? '#f59e0b' : '#10b981')}; transition: width 0.3s ease;"></div>
+                                </div>
+
+                                <!-- All Factors Breakdown Table -->
+                                <div style="font-size: 10.5px; color: #334155; margin-top: 6px; border-top: 1px dashed ${cardBorder}; padding-top: 6px;">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
+                                        <span style="color: #64748b;">📊 Observed Count:</span>
+                                        <strong style="color: ${isElevated ? '#0f172a' : '#64748b'};">${escapeHtml(it.observed)}</strong>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
+                                        <span style="color: #64748b;">🎯 100% Penalty Trigger:</span>
+                                        <span style="color: #475569; font-weight: 600;">${it.full_at}</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                                        <span style="color: #64748b;">📐 Scaling Factor:</span>
+                                        <span style="color: #475569;">${it.scale}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Threat Description -->
+                            <div style="font-size: 10px; color: #475569; background: rgba(255,255,255,0.7); border-radius: 4px; padding: 4px 6px; margin-top: 6px; border-left: 2px solid ${badgeColor}; line-height: 1.35;">
+                                ${escapeHtml(it.desc)}
+                            </div>
+                        </div>
+                        `;
+                    }).join('')}
                 </div>
             </div>
         `;
@@ -490,6 +637,29 @@ document.addEventListener("DOMContentLoaded", function () {
         const breakdownRow = document.getElementById(`breakdown-${safeIp}`);
         if (breakdownRow) {
             breakdownRow.style.display = breakdownRow.style.display === "none" ? "table-row" : "none";
+        }
+    };
+
+    window.quickBlockIp = async function(ip) {
+        if (!confirm(`Are you sure you want to block IP ${ip} for 5 minutes?`)) return;
+        try {
+            const resp = await apiFetch("/admin/security/blocks", {
+                method: "POST",
+                body: JSON.stringify({
+                    ip_address: ip,
+                    minutes: 5,
+                    reason: `Blocked by administrator from Live Scores (Suspicion Score > 80)`
+                })
+            });
+            if (resp.ok) {
+                alert(`IP ${ip} has been blocked successfully! Login and data access revoked.`);
+                loadBlocks();
+            } else {
+                const err = await resp.json();
+                alert(`Failed to block IP: ${err.detail || 'Error'}`);
+            }
+        } catch (e) {
+            alert("Error connecting to server to block IP.");
         }
     };
 
@@ -522,9 +692,14 @@ document.addEventListener("DOMContentLoaded", function () {
                     <td><span class="security-badge ${badgeClass}">${escapeHtml(s.level || "NORMAL")}</span></td>
                     <td><small style="color:#6b7280;">${escapeHtml(maxSignal)}</small></td>
                     <td>
-                        <button class="action-button secondary-button" style="padding: 3px 8px; font-size: 11px;" onclick="toggleScoreBreakdown('${escapeHtml(s.ip_address)}')">
-                            🔍 Signals
-                        </button>
+                        <div style="display: flex; gap: 6px; align-items: center;">
+                            <button class="action-button secondary-button" style="padding: 4px 8px; font-size: 11px; white-space: nowrap;" onclick="toggleScoreBreakdown('${escapeHtml(s.ip_address)}')">
+                                🔍 Signals
+                            </button>
+                            <button class="action-button danger-button" style="padding: 4px 8px; font-size: 11px; white-space: nowrap; background: #ef4444; color: white; border: none; border-radius: 4px; cursor: pointer;" onclick="quickBlockIp('${escapeHtml(s.ip_address)}')">
+                                🚫 Block
+                            </button>
+                        </div>
                     </td>
                 </tr>
                 <tr id="breakdown-${safeIp}" style="display: none; background: #f8fafc;">
@@ -560,9 +735,14 @@ document.addEventListener("DOMContentLoaded", function () {
             <td><span class="security-badge ${badgeClass}">${escapeHtml(scoreItem.level || "NORMAL")}</span></td>
             <td><small style="color:#6b7280;">${escapeHtml(maxSignal)}</small></td>
             <td>
-                <button class="action-button secondary-button" style="padding: 3px 8px; font-size: 11px;" onclick="toggleScoreBreakdown('${escapeHtml(scoreItem.ip_address)}')">
-                    🔍 Signals
-                </button>
+                <div style="display: flex; gap: 6px; align-items: center;">
+                    <button class="action-button secondary-button" style="padding: 4px 8px; font-size: 11px; white-space: nowrap;" onclick="toggleScoreBreakdown('${escapeHtml(scoreItem.ip_address)}')">
+                        🔍 Signals
+                    </button>
+                    <button class="action-button danger-button" style="padding: 4px 8px; font-size: 11px; white-space: nowrap; background: #ef4444; color: white; border: none; border-radius: 4px; cursor: pointer;" onclick="quickBlockIp('${escapeHtml(scoreItem.ip_address)}')">
+                        🚫 Block
+                    </button>
+                </div>
             </td>
         `;
 
@@ -875,14 +1055,14 @@ document.addEventListener("DOMContentLoaded", function () {
     // Utility Helpers
     // -------------------------------------------------------------
     function getScoreBadgeClass(level, score) {
-        if (score >= 75 || level === "TRAP") return "badge-trap";
+        if (score >= 80 || level === "TRAP") return "badge-trap";
         if (score >= 61 || level === "SUSPICIOUS") return "badge-suspicious";
         if (score >= 31 || level === "MONITOR") return "badge-monitor";
         return "badge-normal";
     }
 
     function getScoreColor(score) {
-        if (score >= 75) return "#ef4444";
+        if (score >= 80) return "#ef4444";
         if (score >= 61) return "#f59e0b";
         if (score >= 31) return "#06b6d4";
         return "#10b981";

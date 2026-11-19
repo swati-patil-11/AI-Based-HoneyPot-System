@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>403 Forbidden — IP Address Temporarily Blocked</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            color: #f8fafc;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .block-card {
+            background: rgba(30, 41, 59, 0.95);
+            border: 1px solid #ef4444;
+            box-shadow: 0 25px 50px -12px rgba(239, 68, 68, 0.25);
+            border-radius: 16px;
+            max-width: 580px;
+            width: 100%;
+            padding: 36px;
+            text-align: center;
+            position: relative;
+            backdrop-filter: blur(8px);
+        }
+
+        .shield-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(239, 68, 68, 0.15);
+            border: 2px solid #ef4444;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 38px;
+            box-shadow: 0 0 25px rgba(239, 68, 68, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 20px rgba(239, 68, 68, 0.4); }
+            50% { transform: scale(1.05); box-shadow: 0 0 35px rgba(239, 68, 68, 0.7); }
+            100% { transform: scale(1); box-shadow: 0 0 20px rgba(239, 68, 68, 0.4); }
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 800;
+            color: #f8fafc;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            background: #ef4444;
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-box {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 24px;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .info-value {
+            color: #f8fafc;
+            font-weight: 700;
+            font-family: monospace;
+            font-size: 14px;
+        }
+
+        .timer-box {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+
+        .timer-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #fca5a5;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .countdown {
+            font-size: 36px;
+            font-weight: 800;
+            font-family: monospace;
+            color: #ef4444;
+            letter-spacing: 2px;
+        }
+
+        p.explanation {
+            font-size: 12px;
+            color: #94a3b8;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .action-group {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-refresh {
+            background: #ef4444;
+            color: #ffffff;
+        }
+
+        .btn-refresh:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="block-card">
+        <div class="shield-icon">🛡️</div>
+
+        <h1>Access Denied</h1>
+        <div class="status-badge">HTTP 403 Forbidden — Network Blocked</div>
+
+        <div class="info-box">
+            <div class="info-row">
+                <span class="info-label">Blocked IP Address</span>
+                <span class="info-value" id="blockedIp">{{ ip_address }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Defense Engine</span>
+                <span class="info-value" style="color: #38bdf8;">AI Honeypot Detection</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Trigger Reason</span>
+                <span class="info-value" style="font-size: 12px; font-family: inherit; color: #fca5a5;">{{ reason }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Suspension Lift Time</span>
+                <span class="info-value" style="font-size: 12px;" id="expiryUtc">{{ expires_at }}</span>
+            </div>
+        </div>
+
+        <div class="timer-box">
+            <div class="timer-label">Time Remaining Until Automatic Unblock</div>
+            <div class="countdown" id="timerDisplay">--:--</div>
+        </div>
+
+        <p class="explanation">
+            Your network address has been temporarily suspended due to anomalous automated behavior or high suspicion scoring (Score &ge; 80).
+            Login access, directory endpoints, and data retrieval are currently revoked. Access will be automatically restored once the suspension timer elapses.
+        </p>
+
+        <div class="action-group">
+            <button class="btn btn-refresh" onclick="window.location.reload();">
+                🔄 Re-check Access Status
+            </button>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const expiryStr = "{{ expires_at }}";
+            const timerEl = document.getElementById("timerDisplay");
+            const expiryTime = new Date(expiryStr).getTime();
+
+            function updateTimer() {
+                const now = Date.now();
+                const diff = expiryTime - now;
+
+                if (diff <= 0) {
+                    timerEl.textContent = "EXPIRED";
+                    timerEl.style.color = "#10b981";
+                    setTimeout(() => window.location.reload(), 1500);
+                    return;
+                }
+
+                const totalSec = Math.floor(diff / 1000);
+                const min = Math.floor(totalSec / 60);
+                const sec = totalSec % 60;
+
+                const mm = min < 10 ? "0" + min : min;
+                const ss = sec < 10 ? "0" + sec : sec;
+
+                timerEl.textContent = `${mm}:${ss}`;
+            }
+
+            updateTimer();
+            setInterval(updateTimer, 1000);
+        })();
+    </script>
+
+</body>
+</html>
+

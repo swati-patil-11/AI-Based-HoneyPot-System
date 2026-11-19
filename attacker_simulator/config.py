@@ -55,12 +55,12 @@ IP_BLOCK_DETAIL_KEYWORD = "temporarily blocked"
 # =========================================================
 # Probing endpoints to discover system structure
 PROBE_ENDPOINTS = [
+    "/api/trap/records",               # Decoy legacy export (discovered via /docs)
     "/departments/",
     "/salary/",
     "/users/",                          # Admin-only: triggers 403 (role-based, NOT block)
     "/attendance-page",
     "/payroll-page",
-    "/api/trap/records",               # Decoy legacy export
 ]
 
 # Common employee search queries
